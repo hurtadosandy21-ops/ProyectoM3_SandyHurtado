@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 
 if (!API_KEY) {
   console.error("Falta GEMINI_API_KEY en el archivo .env");
@@ -59,6 +59,44 @@ function rateLimit(req, res, next) {
   next();
 }
 
+
+
+const FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL;
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Llama a Gemini; ante saturación (500/503/504) reintenta y luego prueba el modelo de respaldo
+async function callGemini(body) {
+  const models = [MODEL, FALLBACK_MODEL].filter((m, i, arr) => m && arr.indexOf(m) === i);
+  // Valor por defecto por si todos los intentos fallan por timeout o red
+  let last = { response: { ok: false, status: 504 }, data: {} };
+
+  for (const model of models) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+      const t0 = Date.now();
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": API_KEY },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(15000),
+        });
+        const data = await response.json().catch(() => ({}));
+        console.log(`Gemini ${model} → ${response.status} en ${Date.now() - t0} ms`);
+
+        last = { response, data };
+        if (response.ok) return last;
+        if (![500, 503, 504].includes(response.status)) return last; // otros errores no se reintentan
+      } catch (err) {
+        console.warn(`Gemini ${model} falló tras ${Date.now() - t0} ms (${err.name})`);
+      }
+
+      if (attempt === 0) await sleep(1000); // una sola pausa corta antes del segundo intento
+    }
+  }
+  return last;
+}
 const app = express();
 app.use(express.json({ limit: "50kb" }));
 
@@ -81,24 +119,18 @@ app.post("/api/chat", rateLimit, async (req, res) => {
       return res.status(400).json({ error: "La conversación debe terminar con un mensaje del usuario." });
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": API_KEY },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents,
-        generationConfig: { temperature: 0.9, maxOutputTokens: 600 },
-      }),
-    });
-
-    const data = await response.json().catch(() => ({}));
+ const { response, data } = await callGemini({
+  systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+  contents,
+  generationConfig: { temperature: 0.9, maxOutputTokens: 1000 },
+});
 
     if (!response.ok) {
       console.error("Error de Gemini:", response.status, data?.error?.message);
-      const msg = response.status === 429
-        ? "Doraemon está muy ocupado ahora (límite de uso). Intenta de nuevo en un rato."
-        : "No pude comunicarme con el bolsillo mágico. Intenta de nuevo.";
+const msg =
+  response.status === 429 ? "Doraemon está muy ocupado ahora (límite de uso). Intenta de nuevo en un rato."
+  : response.status === 503 ? "Los servidores del futuro están saturados. Intenta de nuevo en unos segundos."
+  : "No pude comunicarme con el bolsillo mágico. Intenta de nuevo.";
       return res.status(502).json({ error: msg });
     }
 
@@ -120,11 +152,12 @@ app.post("/api/chat", rateLimit, async (req, res) => {
   }
 });
 
-app.use(express.static(path.join(__dirname, "public")));
+
+app.use("/src", express.static(path.join(__dirname, "src")));
 
 // Fallback SPA: cualquier ruta (/chat, /about...) devuelve index.html
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.listen(PORT, () => console.log(`Doraemon Chat en http://localhost:${PORT}`));
