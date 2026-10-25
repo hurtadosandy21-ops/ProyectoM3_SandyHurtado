@@ -33,6 +33,10 @@ html {
   font-size: 16px;
 }
 body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
   font-size: 1rem;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   background: #c8c5c5;
@@ -43,7 +47,8 @@ body {
 .chatApp {
   display: flex;
   flex-direction: column;
-  height: 100vh;  
+  flex: 1;
+  min-height: 0;             /* permite que .chatMessages haga scroll */
   background: #ffffff;
 }
 .chatHeader {
@@ -203,4 +208,74 @@ body {
 
 .btn--primary:hover {
   background: #231d1d;
+}
+
+/* ---- Layout: la app ocupa el alto restante bajo la navegación ---- */
+#app {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+#app > .view { width: 100%; }
+
+.mainNav__link--active {
+  background: #1f2937;
+}
+
+/* ---- Header del chat con botón limpiar ---- */
+.chatHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+.chatHeader__clear {
+  font-family: inherit;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  color: #111827;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.chatHeader__clear:hover { background: #e5e7eb; }
+
+/* ---- Estados ---- */
+.message { white-space: pre-wrap; }
+
+.message--error {
+  align-self: center;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  font-size: 0.875rem;
+}
+
+.chatComposer__send:disabled,
+.chatComposer__input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---- Indicador "escribiendo..." ---- */
+.message--typing {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+.message--typing span {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #9ca3af;
+  animation: typingBounce 1s infinite ease-in-out;
+}
+.message--typing span:nth-child(2) { animation-delay: 0.15s; }
+.message--typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40% { transform: translateY(-0.3rem); opacity: 1; }
 }
