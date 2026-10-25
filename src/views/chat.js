@@ -1,9 +1,12 @@
 import { sendToDoraemon } from "../services/chatService.js";
+import { playEffect, areEffectsMuted, setEffectsMuted } from "../audio.js";
 
 const STORAGE_KEY = "doraemon-chat-history";
 const GREETING = "¡Hola! Soy Doraemon 🔔 ¿En qué te puedo ayudar hoy? ¡Tengo muchos inventos en mi bolsillo!";
+const AVATAR_IMG = "./src/assets/img/Doraemonavatar.jpg";
+const GADGET_IMG = "./src/assets/img/doraemonportada.jpg";
+const GADGET_REGEX = /tatat[aá]+n?|tan,? tan,? tan/i;
 
-// El historial vive en memoria y en sessionStorage, así no se pierde al cambiar de vista
 let history = loadHistory();
 let isSending = false;
 
@@ -26,11 +29,20 @@ export function renderChat() {
   app.innerHTML = `
     <section class="chatApp">
       <header class="chatHeader">
-        <div>
-          <h1 class="chatTitle">Doraemon</h1>
-          <p class="chatSubtitle">Robot gato del futuro</p>
+        <div class="chatProfile">
+          <div class="chatAvatar">
+            <img class="chatAvatar__img" src="${AVATAR_IMG}" alt="Doraemon" />
+            <span class="chatAvatar__status" title="En línea"></span>
+          </div>
+          <div>
+            <h1 class="chatTitle">Doraemon</h1>
+            <p class="chatSubtitle">En línea · Robot gato del futuro</p>
+          </div>
         </div>
-        <button type="button" class="chatHeader__clear" id="clearChat">Limpiar</button>
+        <div class="chatActions">
+          <button type="button" class="iconBtn" id="muteBtn" title="Silenciar o activar los efectos de sonido">🔊</button>
+          <button type="button" class="chatHeader__clear" id="clearChat">Limpiar</button>
+        </div>
       </header>
       <div class="chatMessages" id="messages" aria-live="polite"></div>
       <form class="chatComposer" id="composer" autocomplete="off">
@@ -45,15 +57,38 @@ export function renderChat() {
   const form = document.getElementById("composer");
   const input = document.getElementById("input");
   const sendBtn = document.getElementById("send");
+  const muteBtn = document.getElementById("muteBtn");
+  const avatarImg = app.querySelector(".chatAvatar__img");
+
+  // Si falta la foto, se muestra un emoji dentro del mismo círculo
+  avatarImg.addEventListener("error", () => {
+    const fallback = document.createElement("span");
+    fallback.className = "chatAvatar__fallback";
+    fallback.textContent = "🔔";
+    avatarImg.replaceWith(fallback);
+  });
 
   function scrollToBottom() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
-  function addBubble(text, type) {
+  function addBubble(text, type, { gadget = false } = {}) {
     const div = document.createElement("div");
     div.className = `message message--${type}`;
-    div.textContent = text; // textContent evita inyección de HTML
+
+    if (gadget) {
+      const img = document.createElement("img");
+      img.className = "message__gadget";
+      img.src = GADGET_IMG;
+      img.alt = "Gadget saliendo del bolsillo mágico";
+      img.addEventListener("error", () => img.remove());
+      div.appendChild(img);
+    }
+
+    const span = document.createElement("span");
+    span.textContent = text; // textContent evita inyección de HTML
+    div.appendChild(span);
+
     messagesEl.appendChild(div);
     scrollToBottom();
     return div;
@@ -75,8 +110,18 @@ export function renderChat() {
     if (!value) input.focus();
   }
 
+  function updateMuteBtn() {
+    muteBtn.textContent = areEffectsMuted() ? "🔇" : "🔊";
+  }
+
   // Pintar historial existente
   history.forEach((m) => addBubble(m.text, m.role === "user" ? "user" : "character"));
+  updateMuteBtn();
+
+  muteBtn.addEventListener("click", () => {
+    setEffectsMuted(!areEffectsMuted());
+    updateMuteBtn();
+  });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -96,12 +141,14 @@ export function renderChat() {
       typing.remove();
       history.push({ role: "model", text: reply });
       saveHistory();
-      addBubble(reply, "character");
+
+      const hasGadget = GADGET_REGEX.test(reply);
+      addBubble(reply, "character", { gadget: hasGadget });
+      if (hasGadget) playEffect("gadget");
     } catch (error) {
       typing.remove();
       addBubble(error.message, "error");
-      // Quitamos el último mensaje del usuario para poder reintentar sin duplicar
-      history.pop();
+      history.pop(); // para poder reintentar sin duplicar
       saveHistory();
       input.value = text;
     } finally {

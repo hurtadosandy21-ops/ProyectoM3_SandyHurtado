@@ -2,6 +2,7 @@ import { renderHome } from "./views/home.js";
 import { renderChat } from "./views/chat.js";
 import { renderAbout } from "./views/about.js";
 import { renderNotFound } from "./views/notFound.js";
+import { stopIntro } from "./audio.js";
 
 const routes = {
   "/": renderHome,
@@ -18,6 +19,7 @@ function updateActiveLink(path) {
 export function router() {
   const path = window.location.pathname;
   const render = routes[path] || renderNotFound;
+  stopIntro(); // al cambiar de página siempre se corta la intro; el home la vuelve a iniciar
   updateActiveLink(path);
   render();
 }
