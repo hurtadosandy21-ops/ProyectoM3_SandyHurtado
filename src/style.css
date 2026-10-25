@@ -1,0 +1,206 @@
+.mainNav {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: #111827;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.mainNav__link {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.25rem 1rem;
+  border-radius: 0.5rem;
+  transition: background 0.15s;
+}
+
+.mainNav__link:hover {
+  background: #1f2937;
+}
+
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+body {
+  font-size: 1rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  background: #c8c5c5;
+  color: #111827;
+  line-height: 1.5;
+}
+
+.chatApp {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;  
+  background: #ffffff;
+}
+.chatHeader {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.chatTitle{
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.chatSubtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.chatMessages {
+  flex: 1;                   /* toma todo el espacio disponible */
+  overflow: auto;            /* scroll interno cuando se llena */
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overscroll-behavior-y: contain;
+}
+.chatComposer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.message {
+  max-width: 85%;            /* no ocupan todo el ancho */
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  word-wrap: break-word;
+}
+
+.message--character {
+  align-self: flex-start;    /* izquierda */
+  background: #f3f4f6;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+}
+
+.message--user {
+  align-self: flex-end;      /* derecha */
+  background: #111827;
+  color: #ffffff;
+}
+
+.chatComposer__input {
+  flex: 1;
+  min-width: 0;              /* evita overflow en flex */
+  padding: 0.75rem;
+  font-family:inherit;
+  font-size: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  outline: none;
+}
+.chatComposer__input:focus {
+  border-color: #111827;
+}
+.chatComposer__send{
+  padding: 0.75rem 1.25rem;
+  font-family:inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  background: #111827;
+  border: 0;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;       /* evita que "Enviar" se parta */
+}
+
+.chatComposer__send:hover {
+  background: #000000;
+}
+
+@media (min-width: 768px) {
+  .chatHeader {
+    padding: 1.5rem 1.5rem;
+  }
+  .chatMessages {
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+  .chatComposer {
+    padding: 1rem 1.5rem;
+  }
+  .message {
+    max-width: 75%;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    background: #f3f4f6;
+  }
+
+  .chatApp {
+    max-width: 64rem;
+    margin: 0 auto;
+  }
+  .chatHeader {
+    padding: 1.5rem 2rem;
+  }
+  .chatMessages {
+    padding: 2rem; 
+  }
+  .chatComposer {
+    padding: 1.5rem 2rem;
+  }
+  .message {
+    max-width: 60%;
+  }
+}
+
+
+.view {
+  padding: 2rem 1rem;
+  max-width: 48rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.view h1 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+.view p {
+  margin-bottom: 1.5rem;
+  color: #6b7280;
+}
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.25rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.btn--primary {
+  color: #ffffff;
+  background: #111827;
+  border: 0;
+}
+
+.btn--primary:hover {
+  background: #231d1d;
+}
