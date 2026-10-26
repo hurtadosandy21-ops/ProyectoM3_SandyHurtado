@@ -13,7 +13,7 @@ function createAudio(src, volume, loop = false) {
 }
 
 const sounds = {
-  intro: createAudio("/src/assets/audio/introduccion.mp3", 0.35, true),
+   intro: createAudio("/src/assets/audio/introduccion.mp3", 0.35),
   gadget: createAudio("/src/assets/audio/gadget.mp3", 0.8),
 };
 
@@ -29,9 +29,13 @@ function readMuted() {
   }
 }
 
-["play", "pause"].forEach((type) =>
-  sounds.intro.addEventListener(type, () => introListener?.())
+["play", "pause", "ended", "error"].forEach((type) =>
+  sounds.intro.addEventListener(type, () => introListener?.(type))
 );
+
+export function introFailed() {
+  return Boolean(sounds.intro.error);
+}
 
 /* ---------- Efectos (gadget) ---------- */
 

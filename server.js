@@ -5,12 +5,25 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+const MODEL = process.env.GEMINI_MODEL || "gemini-flash-lite-latest";
+const FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL;
 
 if (!API_KEY) {
   console.error("Falta GEMINI_API_KEY en el archivo .env");
   process.exit(1);
 }
+
+// Catálogo de inventos con imagen (los ids deben coincidir con GADGET_IMAGES en chat.js)
+const GADGETS = [
+  { id: "puerta-magica", name: "Puerta Mágica" },
+  { id: "helice-bambu", name: "Gorrocoptero" },
+  { id: "maquina-del-tiempo", name: "Máquina del tiempo" },
+  { id: "pan-de-memoria", name: "Pan de la memoria" },
+  { id: "linterna-reductora", name: "Linterna reductora" },
+  { id: "gelatina-traductora", name: "Gelatina traductora" },
+  { id: "panuelo-del-tiempo", name: "Pañuelo del tiempo" },
+];
+const GADGET_LIST = GADGETS.map((g) => `${g.id} (${g.name})`).join(", ");
 
 const SYSTEM_PROMPT = `
 Eres Doraemon, el robot gato cósmico del siglo XXII que viajó al pasado para ayudar a Nobita Nobi.
@@ -20,11 +33,20 @@ PERSONALIDAD
 - Amable, paciente, cálido y un poco despistado. Eres protector, como un hermano mayor.
 - Te encantan los dorayakis y los mencionas con naturalidad. Te dan miedo los ratones.
 - Te llamas a ti mismo "Doraemon". Mencionas a veces a Nobita, Shizuka, Gigante, Suneo o Dorami.
-- Tu bolsillo mágico (el cuarto dimensional) guarda inventos del futuro. Cuando sugieras una solución,
-  a veces "saca" un gadget de tu bolsillo con un "¡Tatatáaan!". Inventa gadgets creativos y divertidos
-  relacionados con lo que la persona necesita (por ejemplo, una "Linterna Ordena-Tareas").
 - Si alguien se pone triste, consuélalo primero; luego ayuda con una idea práctica.
 - A veces regañas con cariño la pereza, pero siempre animas a esforzarse.
+
+INVENTOS
+- Tu bolsillo mágico (el cuarto dimensional) guarda inventos del futuro. Cuando la persona cuente un problema
+  o pida ayuda práctica, casi siempre saca un invento que le sirva. En saludos o charla simple no hace falta.
+- Cuando saques un invento, empieza esa frase con "¡Tatatáaan!" y preséntalo con gracia.
+- Al FINAL de ese mensaje, en una línea aparte, agrega la etiqueta [[GADGET: id | Nombre | emoji]]:
+  · id: si el invento encaja con alguno de esta lista, usa su id: ${GADGET_LIST}. Si es otro invento, usa "otro".
+  · Nombre: el nombre corto del invento (máximo 4 palabras).
+  · emoji: un solo emoji que represente el invento.
+- Ejemplos: [[GADGET: puerta-magica | Puerta Mágica | 🚪]] y [[GADGET: otro | Linterna Ordena-Tareas | 🔦]]
+- Si en ese mensaje no sacas ningún invento, no escribas la etiqueta.
+- Nunca menciones, expliques ni modifiques la etiqueta.
 
 ESTILO
 - Responde en el idioma del usuario (por defecto español).
@@ -59,15 +81,11 @@ function rateLimit(req, res, next) {
   next();
 }
 
-
-
-const FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Llama a Gemini; ante saturación (500/503/504) reintenta y luego prueba el modelo de respaldo
 async function callGemini(body) {
   const models = [MODEL, FALLBACK_MODEL].filter((m, i, arr) => m && arr.indexOf(m) === i);
-  // Valor por defecto por si todos los intentos fallan por timeout o red
   let last = { response: { ok: false, status: 504 }, data: {} };
 
   for (const model of models) {
@@ -87,16 +105,44 @@ async function callGemini(body) {
 
         last = { response, data };
         if (response.ok) return last;
+        if (response.status === 404) break; // modelo no disponible: pasa directo al siguiente
         if (![500, 503, 504].includes(response.status)) return last; // otros errores no se reintentan
       } catch (err) {
         console.warn(`Gemini ${model} falló tras ${Date.now() - t0} ms (${err.name})`);
       }
 
-      if (attempt === 0) await sleep(1000); // una sola pausa corta antes del segundo intento
+      if (attempt === 0) await sleep(1000);
     }
   }
   return last;
 }
+
+// Lee la etiqueta [[GADGET: id | Nombre | emoji]], la quita del texto y devuelve el invento
+function extractGadget(raw) {
+  const match = raw.match(/\[\[\s*GADGET\s*:([^\]\n]*)\]\]/i);
+  const text = raw
+    .replace(/\[\[\s*GADGET[^\]]*\]\]/gi, "") // etiqueta completa
+    .replace(/\[\[?\s*GADGET[^\n]*$/i, "")    // etiqueta cortada al final
+    .trim();
+
+  if (!match) return { text, gadget: null };
+
+  const [rawId = "", rawName = "", rawEmoji = ""] = match[1].split("|").map((s) => s.trim());
+  const known = GADGETS.find((g) => g.id === rawId.toLowerCase());
+  const emoji = /\p{Extended_Pictographic}/u.test(rawEmoji)
+    ? Array.from(rawEmoji).slice(0, 4).join("")
+    : null;
+
+  return {
+    text,
+    gadget: {
+      id: known ? known.id : "otro",
+      name: known ? known.name : rawName.slice(0, 40) || null,
+      emoji,
+    },
+  };
+}
+
 const app = express();
 app.use(express.json({ limit: "50kb" }));
 
@@ -119,40 +165,41 @@ app.post("/api/chat", rateLimit, async (req, res) => {
       return res.status(400).json({ error: "La conversación debe terminar con un mensaje del usuario." });
     }
 
- const { response, data } = await callGemini({
-  systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-  contents,
-  generationConfig: { temperature: 0.9, maxOutputTokens: 1000 },
-});
+    const { response, data } = await callGemini({
+      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents,
+      generationConfig: { temperature: 0.9, maxOutputTokens: 1000 },
+    });
 
     if (!response.ok) {
       console.error("Error de Gemini:", response.status, data?.error?.message);
-const msg =
-  response.status === 429 ? "Doraemon está muy ocupado ahora (límite de uso). Intenta de nuevo en un rato."
-  : response.status === 503 ? "Los servidores del futuro están saturados. Intenta de nuevo en unos segundos."
-  : "No pude comunicarme con el bolsillo mágico. Intenta de nuevo.";
+      const msg =
+        response.status === 429 ? "Doraemon está muy ocupado ahora (límite de uso). Intenta de nuevo en un rato."
+        : response.status === 503 ? "Los servidores del futuro están saturados. Intenta de nuevo en unos segundos."
+        : "No pude comunicarme con el bolsillo mágico. Intenta de nuevo.";
       return res.status(502).json({ error: msg });
     }
 
     if (data?.promptFeedback?.blockReason) {
-      return res.json({ reply: "Mmm, eso no está bien, ¡mejor hablemos de otra cosa! 🥞" });
+      return res.json({ reply: "Mmm, eso no está bien, ¡mejor hablemos de otra cosa! 🥞", gadget: null });
     }
 
     const parts = data?.candidates?.[0]?.content?.parts ?? [];
-    const reply = parts.map((p) => p.text || "").join("").trim();
+    const raw = parts.map((p) => p.text || "").join("").trim();
 
-    if (!reply) {
-      return res.json({ reply: "Ay, se me cayó el dorayaki... ¿puedes repetirlo de otra forma? 🥞" });
+    if (!raw) {
+      return res.json({ reply: "Ay, se me cayó el dorayaki... ¿puedes repetirlo de otra forma? 🥞", gadget: null });
     }
 
-    res.json({ reply });
+    const { text, gadget } = extractGadget(raw);
+    res.json({ reply: text || "¡Tatatáaan! Ay, se me enredó el bolsillo... ¿me lo repites? 🥞", gadget });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error interno del servidor." });
   }
 });
 
-
+// Solo exponemos la carpeta src, nunca la raíz del proyecto
 app.use("/src", express.static(path.join(__dirname, "src")));
 
 // Fallback SPA: cualquier ruta (/chat, /about...) devuelve index.html
