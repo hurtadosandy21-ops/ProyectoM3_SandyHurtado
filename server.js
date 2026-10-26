@@ -8,6 +8,7 @@ const API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = process.env.GEMINI_MODEL || "gemini-flash-lite-latest";
 const FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL;
 
+
 if (!API_KEY) {
   console.error("Falta GEMINI_API_KEY en el archivo .env");
   process.exit(1);
@@ -200,11 +201,27 @@ app.post("/api/chat", rateLimit, async (req, res) => {
 });
 
 // Solo exponemos la carpeta src, nunca la raíz del proyecto
-app.use("/src", express.static(path.join(__dirname, "src")));
+const publicSourceDir = path.resolve(__dirname, "src");
+app.use("/src", (req, res, next) => {
+  const requestedFile = path.resolve(publicSourceDir, `.${req.path}`);
+  if (!requestedFile.startsWith(`${publicSourceDir}${path.sep}`)) {
+    return res.sendStatus(404);
+  }
+  res.sendFile(requestedFile, (error) => {
+    if (error?.status === 404 || error?.code === "ENOENT") return res.sendStatus(404);
+    if (error) next(error);
+  });
+});
 
 // Fallback SPA: cualquier ruta (/chat, /about...) devuelve index.html
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-app.listen(PORT, () => console.log(`Doraemon Chat en http://localhost:${PORT}`));
+// Vercel detects the exported app; local runs start a regular HTTP server.
+export default app;
+
+
+if (process.env.NODE_ENV !== "test" && process.env.VERCEL !== "1") {
+  app.listen(PORT, () => console.log(`Doraemon Chat en http://localhost:${PORT}`));
+}
