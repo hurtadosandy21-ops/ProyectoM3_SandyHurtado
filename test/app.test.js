@@ -3,6 +3,7 @@ import request from "supertest";
 
 process.env.GEMINI_API_KEY ||= "test-key-for-vitest";
 const { default: app } = await import("../server.js");
+const { default: chatHandler } = await import("../api/chat.js");
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -32,6 +33,12 @@ describe("Aplicación Express", () => {
 });
 
 describe("POST /api/chat", () => {
+  it("expone el endpoint como función explícita para Vercel", async () => {
+    const response = await request(chatHandler).post("/api/chat").send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toMatch(/inválidos/i);
+  });
   it("rechaza un historial ausente", async () => {
     const response = await request(app).post("/api/chat").send({});
 
