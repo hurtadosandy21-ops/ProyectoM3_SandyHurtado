@@ -336,6 +336,14 @@ body {
   height: auto;
   border-radius: 1.25rem;
   filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.2));
+  transition: filter 0.45s ease, transform 0.45s ease;
+}
+.heroStage--revealed {
+  animation-play-state: paused;
+}
+.heroStage--revealed .hero__img {
+  filter: blur(2.5px) brightness(0.8) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.2));
+  transform: scale(1.025);
 }
 .heroStage__overlay {
   position: absolute;

@@ -74,6 +74,7 @@ export function renderHome() {
     gate.classList.add("is-hidden");
     startBtn.classList.remove("is-hidden");
     startBtn.classList.add("btn--reveal");
+    stage.classList.add("heroStage--revealed");
   }
 
   // El audio avisa cuando empieza, se pausa, termina o falla
