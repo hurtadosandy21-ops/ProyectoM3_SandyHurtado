@@ -88,8 +88,8 @@ function removeUnlock() {
 function armUnlock() {
   if (unlockHandler) return;
   unlockHandler = (event) => {
-    // Un clic en un enlace o en el botón de música no debe encender la música
-    if (event.target instanceof Element && event.target.closest("a, #musicBtn")) return;
+    // Los enlaces y botones de la interfaz no deben activar el audio por accidente
+    if (event.target instanceof Element && event.target.closest("a, button")) return;
     removeUnlock();
     sounds.intro.play().catch(() => {});
   };
