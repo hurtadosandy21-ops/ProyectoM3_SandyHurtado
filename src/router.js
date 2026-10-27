@@ -18,6 +18,7 @@ function updateActiveLink(path) {
 
 export function router() {
   const path = window.location.pathname;
+  document.body.classList.toggle("chat-route", path === "/chat");
   const render = routes[path] || renderNotFound;
   stopIntro(); // al cambiar de página siempre se corta la intro; el home la vuelve a iniciar
   updateActiveLink(path);

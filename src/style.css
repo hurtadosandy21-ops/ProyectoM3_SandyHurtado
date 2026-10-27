@@ -296,10 +296,8 @@ body {
   --dora-text-soft: #3f6178;
 }
 
-/* Base: altura fija para que solo haga scroll la zona de mensajes */
+/* Tema Doraemon y ajustes de layout para la aplicación. */
 body {
-  height: 100vh;
-  height: 100dvh;
   background: var(--dora-bg);
   font-family: "Comic Sans MS", "Comic Neue", system-ui, sans-serif; /* opcional, va con ComicSansCon */
 }
@@ -550,4 +548,52 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; }
+}
+/* El chat usa scroll interno; el resto de páginas conserva el scroll natural. */
+.mainNav { flex: 0 0 auto; }
+.chatHeader,
+.chatComposer { flex: 0 0 auto; }
+.chatMessages {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+body.chat-route {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* En laptop, el chat queda centrado y con márgenes laterales y verticales. */
+@media (min-width: 1024px) {
+  #app { padding: 1.25rem clamp(1.25rem, 4vw, 3rem); }
+  .chatApp {
+    width: min(100%, 58rem);
+    max-width: 58rem;
+    max-height: 54rem;
+    margin: auto;
+    overflow: hidden;
+    border-radius: 1.25rem;
+  }
+  .chatHeader { padding: 1rem 1.5rem; }
+  .chatMessages { padding: 1.25rem 1.5rem; }
+  .chatComposer { padding: 1rem 1.5rem; }
+  .message { max-width: 68%; }
+}
+
+/* Si el alto disponible es reducido (móvil horizontal o teclado abierto),
+   la página puede crecer y desplazarse para no ocultar el encabezado o el envío. */
+@media (max-height: 42rem) {
+  body.chat-route {
+    height: auto;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  body.chat-route #app {
+    flex: 0 0 auto;
+    min-height: calc(100dvh - 4rem);
+  }
+  body.chat-route .chatApp { min-height: 34rem; }
 }
