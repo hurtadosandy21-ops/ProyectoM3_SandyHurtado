@@ -40,7 +40,7 @@ La portada intenta reproducir la música de introducción al entrar. Algunos nav
 ## Cómo se usa
 
 1. Abre la [aplicación de Doraemon Chat](https://proyectom3sandyhurtado.vercel.app/).
-2. Al entrar, la portada intenta reproducir la música de introducción. Cuando termina, aparece **Empezar a chatear**. Si prefieres no esperar, pulsa **Saltar intro** o **Desactivar música**; también puedes entrar desde **Chat** en la barra de navegación.
+2. Al entrar, la portada intenta reproducir la música de introducción. Puedes esperar a que termine o tocar la imagen de Doraemon o **Saltar intro** para mostrar **Empezar a chatear** de inmediato; al omitirla, la música se detiene. Si el navegador bloquea el audio, el botón también queda disponible. Además, puedes entrar desde **Chat** en la barra de navegación.
 3. Para iniciar con un tema específico, elige una de las tarjetas de la portada: **Ideas prácticas**, **Inventos del futuro** o **Una charla amable**. Cada tarjeta abre el chat con ese enfoque.
 4. Escribe tu pregunta en el campo de mensaje y pulsa **Enviar**. Doraemon responderá en español y, si corresponde, presentará un invento después de explicar cómo puede ayudarte.
 5. Abre **Historial** para volver a una conversación o pulsa **+ Nueva** para iniciar otra. Desde ahí puedes borrar una conversación o vaciar el historial; la aplicación te pedirá confirmación, salvo que hayas elegido no volver a mostrarla.

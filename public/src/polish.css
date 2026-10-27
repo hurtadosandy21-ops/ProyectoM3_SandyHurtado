@@ -255,7 +255,8 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   font-weight: 750;
   letter-spacing: .02em;
 }
-.heroStage__badge span { color: #83e5a7; font-size: .55rem; }
+.heroStage__badge > span:first-child { color: #83e5a7; font-size: .55rem; }
+.heroStage__badgeLabel { color: white; font-size: inherit; }
 .heroStage .btn { z-index: 1; margin: 0; box-shadow: 0 .8rem 1.8rem rgba(0, 55, 82, .25); }
 .heroStage figcaption { display: flex; align-items: center; gap: .55rem; padding: .75rem .4rem .2rem; color: var(--muted); font-size: .76rem; font-weight: 650; }
 .heroStage__captionMark { display: grid; width: 1.65rem; height: 1.65rem; place-items: center; border-radius: .55rem; background: var(--blue-light); }
@@ -605,4 +606,83 @@ body.chat-route .message { padding: .65rem .8rem; font-size: .86rem; }
     min-height: 0;
     flex: 1 1 auto;
   }
+}
+
+/* En móvil, el viewport queda fijo y el desplazamiento pertenece a los mensajes. */
+@media (max-width: 640px) {
+  body.chat-route {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+  body.chat-route .siteHeader {
+    flex: 0 0 auto;
+  }
+  body.chat-route #app {
+    min-height: 0;
+    flex: 1 1 0;
+    overflow: hidden;
+    padding: .35rem .5rem calc(.35rem + env(safe-area-inset-bottom, 0px));
+  }
+  body.chat-route .chatApp {
+    height: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
+    margin: 0;
+  }
+  body.chat-route .chatHeader,
+  body.chat-route .chatSoundNote,
+  body.chat-route .chatComposer {
+    flex: 0 0 auto;
+  }
+  body.chat-route .chatMessages {
+    min-height: 0;
+    flex: 1 1 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* En tablets, la portada apila el contenido con espacio suficiente para cada bloque. */
+@media (min-width: 641px) and (max-width: 900px) {
+  .view--home.hero.pageShell {
+    width: min(calc(100% - 2.5rem), 44rem);
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-items: start;
+    gap: 1rem;
+    padding-block: clamp(1.5rem, 4vh, 2.5rem) 1rem;
+  }
+  .heroCopy--heading { grid-column: 1; grid-row: 1; }
+  .heroStage {
+    grid-column: 1;
+    grid-row: 2;
+    width: min(100%, 19rem);
+    justify-self: center;
+  }
+  .heroCopy--details {
+    grid-column: 1;
+    grid-row: 3;
+    width: 100%;
+    max-width: 42rem;
+    justify-self: center;
+  }
+  .heroCopy__text { max-width: 40rem; }
+  .heroFeatures { margin-bottom: 1rem; }
+  .introPanel { max-width: 34rem; }
+  .welcomeStrip { width: min(calc(100% - 2.5rem), 44rem); }
+}
+
+.heroStage .hero__img { cursor: pointer; }
+.heroStage--revealed .hero__img { cursor: default; }
+.heroStage__overlay { pointer-events: none; }
+.heroStage__badge { pointer-events: none; }
+.heroStage__overlay .btn { pointer-events: auto; }
+.heroStage .hero__img:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: -5px;
 }

@@ -23,9 +23,9 @@ export function renderHome() {
 
       <figure class="heroStage" id="heroStage">
         <div class="heroStage__frame">
-          <img class="hero__img" src="${HERO_IMG}" alt="Doraemon, el amigo robot del futuro" />
+          <img class="hero__img" src="${HERO_IMG}" alt="Doraemon, el amigo robot del futuro" tabindex="0" role="button" aria-label="Toca la imagen para mostrar el botón de chat" />
           <div class="heroStage__overlay">
-            <span class="heroStage__badge"><span aria-hidden="true">●</span> Listo para conversar</span>
+            <span class="heroStage__badge"><span aria-hidden="true">●</span><span class="heroStage__badgeLabel" id="heroBadgeLabel">Toca la imagen para empezar</span></span>
             <a class="btn btn--primary is-hidden" id="startBtn" href="/chat">Empezar a chatear <span aria-hidden="true">→</span></a>
           </div>
         </div>
@@ -66,6 +66,7 @@ export function renderHome() {
   const hint = document.getElementById("introHint");
   const skipBtn = document.getElementById("skipBtn");
   const startBtn = document.getElementById("startBtn");
+  const badgeLabel = document.getElementById('heroBadgeLabel');
 
   img.addEventListener("error", () => {
     console.warn(`[img] No se pudo cargar ${HERO_IMG}. Revisa el nombre y la carpeta.`);
@@ -89,11 +90,30 @@ export function renderHome() {
     if (introDone) return;
     introDone = true;
     skipBtn.classList.add("is-hidden");
+    badgeLabel.textContent = "Listo para conversar";
     startBtn.classList.remove("is-hidden");
     startBtn.classList.add("btn--reveal");
     stage.classList.add("heroStage--revealed");
+    img.removeAttribute('tabindex');
+    img.removeAttribute('role');
+    img.removeAttribute('aria-label');
   }
 
+  function revealStartFromImage() {
+    if (introDone) return;
+    stopIntro();
+    revealStart();
+    hint.textContent = "La intro se omitió. Puedes empezar a chatear o activar la música cuando quieras.";
+    updateMusicBtn();
+  }
+
+  img.addEventListener("click", revealStartFromImage);
+  img.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      revealStartFromImage();
+    }
+  });
   setIntroListener((type) => {
     if (!document.body.contains(startBtn)) return;
     if (type === "play") hint.textContent = HINT_PLAYING;
@@ -125,11 +145,14 @@ export function renderHome() {
     updateMusicBtn();
   });
 
-  if (introFailed()) revealStart();
-  else {
+  if (introFailed()) {
+    revealStart();
+    hint.textContent = "No se pudo cargar la música. Puedes empezar a chatear o volver a intentarlo con el botón de música.";
+  } else {
     startIntro().then((started) => {
       if (!started && !introDone) {
-        hint.textContent = "El navegador puede bloquear la reproducción automática. Toca «Activar música» para escuchar la intro.";
+        revealStart();
+        hint.textContent = "La música no inició automáticamente. Puedes empezar a chatear ahora o activarla cuando quieras.";
       }
     });
   }
