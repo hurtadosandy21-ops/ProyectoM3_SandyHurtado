@@ -50,6 +50,7 @@ export function renderHome() {
             <button type="button" class="skipBtn" id="skipBtn">Saltar intro</button>
           </div>
           <p class="introHint" id="introHint">${HINT_WAITING}</p>
+          <p class="introCredit">Tema: <em>Doraemon no Uta</em>. Música: <strong>Shunsuke Kikuchi</strong>. <a href="/about">Ver créditos</a>.</p>
         </div>
       </div>
     </section>

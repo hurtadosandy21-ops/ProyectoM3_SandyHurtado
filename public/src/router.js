@@ -24,8 +24,10 @@ export function router() {
   stopIntro(); // al cambiar de página siempre se corta la intro; el home la vuelve a iniciar
   updateActiveLink(path);
   if (path === "/chat") {
-    const topic = new URLSearchParams(window.location.search).get("tema");
-    render({ topic });
+    const params = new URLSearchParams(window.location.search);
+    const topic = params.get("tema");
+    const recommendation = params.get("recomendacion");
+    render({ topic, recommendation });
   } else {
     render();
   }

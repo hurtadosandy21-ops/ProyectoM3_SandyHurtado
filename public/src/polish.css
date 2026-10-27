@@ -774,3 +774,671 @@ body.chat-route .message { padding: .65rem .8rem; font-size: .86rem; }
   }
   .historyToggle { padding-inline: .7rem; }
 }
+
+.introCredit {
+  margin: .45rem 0 0;
+  color: var(--muted);
+  font-size: .62rem;
+  line-height: 1.45;
+}
+.introCredit a { color: var(--blue-deep); font-weight: 700; text-decoration: underline; text-underline-offset: .15em; }
+.musicCredits {
+  margin-top: 1.25rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: 0 .5rem 1.5rem rgba(22, 68, 91, .05);
+}
+.musicCredits .eyebrow { margin-bottom: .45rem; }
+.musicCredits h2 { margin: 0 0 .55rem; color: var(--ink); font-size: clamp(1.1rem, 2.3vw, 1.4rem); }
+.musicCredits > p:not(.eyebrow) { margin: .45rem 0; color: var(--muted); font-size: .82rem; line-height: 1.6; }
+.musicCredits ul { display: grid; gap: .45rem; margin: .75rem 0; padding-left: 1.2rem; color: var(--muted); font-size: .8rem; line-height: 1.55; }
+.musicCredits li strong { color: var(--ink); }
+.musicCredits a { color: var(--blue-deep); font-weight: 700; text-underline-offset: .15em; }
+.musicCredits .musicCredits__legal { margin-top: .8rem; font-size: .7rem; }
+
+.aboutMedia {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: .8rem;
+}
+.aboutMedia .musicCredits { margin-top: 0; }
+
+.soundNoticeDialog .eyebrow { margin: 0 0 .45rem; }
+.soundNoticeDialog h2 { margin-bottom: .55rem; }
+.soundNoticeDialog .confirmDialog__content > p:not(.eyebrow) { color: var(--muted); font-size: .84rem; line-height: 1.6; }
+.confirmDialog__continue { border: 1px solid var(--blue); color: white; background: var(--blue); }
+.confirmDialog__continue:hover { border-color: var(--blue-deep); background: var(--blue-deep); }
+
+/* En móvil, separar la navegación de los controles para que la barra no se desborde. */
+@media (max-width: 640px) {
+  .siteHeader {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    row-gap: .25rem;
+    column-gap: .5rem;
+    min-height: 0;
+  }
+
+  .siteHeader .brand {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .siteHeader .headerControls {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .siteHeader .mainNav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: center;
+    width: max-content;
+    max-width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  .siteHeader .mainNav__link {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding-inline: clamp(.4rem, 3vw, .7rem);
+  }
+}
+
+/* Alinear cada control con su enlace en la barra móvil. */
+@media (max-width: 640px) {
+  .siteHeader {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto auto;
+    column-gap: .15rem;
+    row-gap: .15rem;
+    justify-items: center;
+  }
+
+  .siteHeader .brand {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+  }
+
+  .siteHeader .brand__name { display: none; }
+  .siteHeader .mainNav,
+  .siteHeader .headerControls { display: contents; }
+
+  .siteHeader .mainNav__link {
+    flex: initial;
+    justify-self: center;
+    white-space: nowrap;
+    padding: .38rem clamp(.3rem, 2vw, .55rem);
+    font-size: clamp(.65rem, 2.8vw, .75rem);
+  }
+
+  .siteHeader .mainNav__link:nth-child(1) { grid-column: 1; grid-row: 2; }
+  .siteHeader .mainNav__link:nth-child(2) { grid-column: 2; grid-row: 2; }
+  .siteHeader .mainNav__link:nth-child(3) { grid-column: 3; grid-row: 2; }
+
+  .siteHeader .headerControls .soundToggle {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .siteHeader .headerControls [data-theme-toggle] {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .siteHeader .themeToggle {
+    width: 2.15rem;
+    min-height: 2.15rem;
+    justify-self: center;
+    padding: .35rem;
+  }
+}
+
+/* La campana abre un selector accesible de recomendaciones. */
+.recommendationToggle { justify-self: auto; }
+.recommendationChoices { display: grid; gap: .5rem; margin-top: .9rem; }
+.recommendationChoice {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .65rem;
+  padding: .7rem .75rem;
+  border: 1px solid var(--border);
+  border-radius: .75rem;
+  color: var(--ink);
+  background: var(--surface);
+  text-decoration: none;
+  transition: border-color .18s ease, background-color .18s ease, transform .18s ease;
+}
+.recommendationChoice:hover { border-color: var(--blue); background: var(--blue-light); transform: translateY(-1px); }
+.recommendationChoice > span:first-child { font-size: 1.15rem; }
+.recommendationChoice strong, .recommendationChoice small { display: block; }
+.recommendationChoice strong { font-size: .83rem; }
+.recommendationChoice small { margin-top: .12rem; color: var(--muted); font-size: .7rem; }
+.recommendationChoice > span:last-child { color: var(--blue-deep); font-size: 1.25rem; }
+.recommendationDialog .confirmDialog__actions { margin-top: .75rem; }
+
+@media (max-width: 820px) {
+  body { padding-bottom: calc(4.25rem + env(safe-area-inset-bottom)); }
+  body.chat-route { padding-bottom: calc(4.25rem + env(safe-area-inset-bottom)); }
+  .siteHeader,
+  body.chat-route .siteHeader {
+    width: calc(100% - 1rem);
+    min-height: 3.25rem;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto;
+    gap: .25rem;
+    margin-top: .45rem;
+    padding: .35rem .45rem;
+  }
+  .siteHeader .brand,
+  body.chat-route .siteHeader .brand {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+  }
+  .siteHeader .brand__name { display: none; }
+  .siteHeader .mainNav,
+  body.chat-route .siteHeader .mainNav {
+    display: flex;
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    max-width: none;
+    justify-self: stretch;
+    justify-content: flex-end;
+    gap: 0;
+    padding: 0;
+    flex-wrap: nowrap;
+  }
+  .siteHeader .mainNav__link,
+  body.chat-route .siteHeader .mainNav__link {
+    flex: 0 0 auto;
+    padding: .38rem clamp(.28rem, 1.8vw, .5rem);
+    font-size: clamp(.62rem, 2.65vw, .72rem);
+    white-space: nowrap;
+  }
+  .siteHeader .headerControls,
+  body.chat-route .siteHeader .headerControls {
+    position: fixed;
+    z-index: 30;
+    right: auto;
+    bottom: max(.45rem, env(safe-area-inset-bottom));
+    left: 50%;
+    display: grid;
+    width: min(calc(100% - 1rem), 28rem);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .3rem;
+    padding: .35rem;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: var(--surface);
+    box-shadow: 0 .35rem 1.4rem rgba(12, 43, 59, .22);
+    transform: translateX(-50%);
+  }
+  .siteHeader .headerControls .themeToggle,
+  body.chat-route .siteHeader .headerControls .themeToggle,
+  .siteHeader .headerControls .soundToggle,
+  body.chat-route .siteHeader .headerControls .soundToggle {
+    display: inline-flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 2.8rem;
+    align-items: center;
+    justify-content: center;
+    gap: .3rem;
+    padding: .35rem .2rem;
+    border-radius: .7rem;
+    font-size: clamp(.65rem, 2.7vw, .75rem);
+    white-space: nowrap;
+  }
+  .siteHeader .headerControls [data-sound-label],
+  .siteHeader .headerControls [data-theme-label],
+  .siteHeader .headerControls [data-recommendation-label] { display: inline; }
+  .siteHeader .headerControls .soundToggle,
+  body.chat-route .siteHeader .headerControls .soundToggle,
+  .siteHeader .headerControls [data-theme-toggle],
+  body.chat-route .siteHeader .headerControls [data-theme-toggle],
+  .siteHeader .headerControls [data-recommendation-toggle] {
+    grid-column: auto;
+    grid-row: auto;
+    justify-self: stretch;
+  }
+  .siteHeader .headerControls .themeToggle svg { width: .95rem; height: .95rem; }
+  body.chat-route #app { padding-bottom: .35rem; }
+}
+
+/* El dock inferior solo existe en el chat y agrupa también el historial. */
+body:not(.chat-route) .headerHistoryToggle { display: none; }
+.chatActions { justify-content: flex-end; }
+.recommendationLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .45rem;
+  margin-top: .7rem;
+}
+.recommendationLinks a,
+.recommendationLinks button {
+  display: inline-flex;
+  min-height: 2.2rem;
+  align-items: center;
+  justify-content: center;
+  padding: .4rem .65rem;
+  border: 1px solid var(--border);
+  border-radius: .65rem;
+  color: var(--blue-deep);
+  background: var(--surface);
+  font: inherit;
+  font-size: .72rem;
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
+}
+.recommendationLinks a:hover,
+.recommendationLinks button:hover { border-color: var(--blue); background: var(--blue-light); }
+.recommendationLinks small { flex-basis: 100%; color: var(--muted); font-size: .65rem; }
+
+@media (max-width: 820px) {
+  body:not(.chat-route) .siteHeader .headerControls { display: none; }
+  body.chat-route .siteHeader .headerControls { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  body.chat-route .headerHistoryToggle { display: inline-flex; min-width: 0; }
+  .recommendationLinks small { line-height: 1.4; }
+}
+
+@media (max-width: 820px) {
+  body:not(.chat-route) { padding-bottom: 0; }
+  body:not(.chat-route) .siteHeader { grid-template-columns: auto minmax(0, 1fr) auto; }
+  body:not(.chat-route) .siteHeader .headerControls {
+    position: static;
+    display: inline-flex;
+    width: auto;
+    grid-column: 3;
+    grid-row: 1;
+    gap: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+  }
+  body:not(.chat-route) .headerHistoryToggle,
+  body:not(.chat-route) [data-sound-toggle],
+  body:not(.chat-route) [data-recommendation-toggle] { display: none; }
+  body:not(.chat-route) [data-theme-toggle] {
+    display: inline-flex;
+    width: 2.2rem;
+    min-height: 2.2rem;
+    padding: .35rem;
+  }
+  body:not(.chat-route) [data-theme-label] { display: none; }
+  body.chat-route .siteHeader .headerControls {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 820px) {
+  body:not(.chat-route) .siteHeader .headerControls [data-theme-toggle] {
+    width: 2.2rem;
+    min-height: 2.2rem;
+    gap: 0;
+    padding: .35rem;
+  }
+  body.chat-route .siteHeader .headerControls [data-theme-label] { display: none; }
+  body.chat-route .siteHeader .headerControls [data-theme-toggle]::after {
+    content: "Tema";
+    font-size: .65rem;
+  }
+}
+
+/* En teléfonos, la segunda fila queda integrada en la propia navegación. */
+.messageActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .3rem;
+  margin-top: .35rem;
+}
+.message--character .messageActions { justify-content: flex-start; }
+.messageActions button {
+  min-height: 1.65rem;
+  padding: .22rem .48rem;
+  border: 1px solid var(--border);
+  border-radius: .5rem;
+  color: var(--muted);
+  background: var(--surface);
+  font-size: .66rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.messageActions button:hover { border-color: var(--blue); color: var(--blue-deep); }
+.chatComposer__cancel {
+  min-height: 2.5rem;
+  padding: .4rem .65rem;
+  border: 1px solid var(--border);
+  border-radius: .7rem;
+  color: var(--ink);
+  background: var(--surface);
+  font-size: .72rem;
+  font-weight: 700;
+}
+.chatComposer__cancel.is-hidden { display: none; }
+
+@media (max-width: 640px) {
+  body.chat-route { padding-bottom: 0; }
+  body.chat-route .siteHeader {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    row-gap: .2rem;
+    padding: .28rem .38rem .34rem;
+  }
+  body.chat-route .siteHeader .brand { grid-column: 1; grid-row: 1; }
+  body.chat-route .siteHeader .brand__mark { width: 1.7rem; height: 1.7rem; font-size: .9rem; }
+  body.chat-route .siteHeader .mainNav {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: space-around;
+    overflow: visible;
+  }
+  body.chat-route .siteHeader .mainNav__link {
+    padding: .32rem clamp(.18rem, 1.2vw, .4rem);
+    font-size: clamp(.61rem, 2.7vw, .72rem);
+  }
+  body.chat-route .siteHeader .headerControls {
+    position: static;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: .22rem;
+    padding: .12rem 0 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+  }
+  body.chat-route .siteHeader .headerControls .themeToggle,
+  body.chat-route .siteHeader .headerControls .soundToggle,
+  body.chat-route .siteHeader .headerControls .historyToggle {
+    display: inline-flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 2.05rem;
+    align-items: center;
+    justify-content: center;
+    gap: .16rem;
+    padding: .2rem .12rem;
+    border-radius: .55rem;
+    font-size: clamp(.57rem, 2.35vw, .68rem);
+    white-space: nowrap;
+  }
+  body.chat-route .siteHeader .headerControls [data-theme-label] { display: none; }
+  body.chat-route .siteHeader .headerControls [data-theme-toggle]::after { content: "Tema"; }
+  body.chat-route .siteHeader .headerControls [data-recommendation-label] { display: inline; }
+  body.chat-route .chatHeader { padding: .5rem .6rem; }
+  body.chat-route .chatComposer__cancel { min-height: 2.25rem; padding-inline: .45rem; }
+}
+
+@media (max-width: 380px) {
+  body.chat-route .siteHeader .headerControls [data-recommendation-label] { display: none; }
+  body.chat-route .siteHeader .headerControls [data-recommendation-toggle]::after { content: ""; }
+}
+
+/* Las recomendaciones solo se ofrecen dentro de una conversación. */
+body:not(.chat-route) .recommendationToggle { display: none; }
+
+/* En Inicio y Acerca de, conserva el espacio de la navegación como en Chat. */
+@media (max-width: 640px) {
+  body:not(.chat-route) .siteHeader {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: .35rem;
+    row-gap: .15rem;
+    padding: .28rem .38rem .34rem;
+  }
+  body:not(.chat-route) .siteHeader .brand {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  body:not(.chat-route) .siteHeader .mainNav {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: space-around;
+  }
+  body:not(.chat-route) .siteHeader .mainNav__link {
+    padding: .32rem clamp(.18rem, 1.2vw, .4rem);
+    font-size: clamp(.61rem, 2.7vw, .72rem);
+  }
+  body:not(.chat-route) .siteHeader .headerControls {
+    position: static;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    padding: .08rem 0 0;
+  }
+  body:not(.chat-route) .siteHeader .headerControls [data-theme-toggle] {
+    width: 2.05rem;
+    min-height: 2.05rem;
+    padding: .3rem;
+  }
+}
+
+/* En móvil, apilar marca, navegación y controles dentro de una sola barra. */
+@media (max-width: 640px) {
+  .siteHeader,
+  body.chat-route .siteHeader {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    justify-items: stretch;
+    row-gap: .18rem;
+    padding: .35rem .45rem;
+  }
+  .siteHeader .brand,
+  body.chat-route .siteHeader .brand {
+    grid-column: 1;
+    grid-row: 1;
+    display: inline-flex;
+    justify-self: center;
+    gap: .45rem;
+  }
+  .siteHeader .brand__name { display: inline; }
+  .siteHeader .mainNav,
+  body.chat-route .siteHeader .mainNav {
+    grid-column: 1;
+    grid-row: 2;
+    justify-content: center;
+    gap: .1rem;
+  }
+  .siteHeader .headerControls,
+  body.chat-route .siteHeader .headerControls {
+    position: static;
+    grid-column: 1;
+    grid-row: 3;
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: .18rem;
+    margin-top: .12rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+  }
+  body:not(.chat-route) .siteHeader .headerControls {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .siteHeader .headerControls .themeToggle,
+  body.chat-route .siteHeader .headerControls .themeToggle,
+  .siteHeader .headerControls .soundToggle,
+  body.chat-route .siteHeader .headerControls .soundToggle,
+  body.chat-route .siteHeader .headerControls .historyToggle,
+  body.chat-route .siteHeader .headerControls [data-recommendation-toggle] {
+    min-width: 0;
+    padding-inline: .1rem;
+  }
+}
+
+/* Historial conserva el ancho de su etiqueta y deja sitio a los demás controles. */
+@media (max-width: 640px) {
+  body.chat-route .siteHeader .headerControls {
+    grid-template-columns: max-content repeat(3, minmax(0, 1fr));
+  }
+  body.chat-route .siteHeader .headerControls .historyToggle {
+    width: max-content;
+    min-width: 0;
+    justify-self: start;
+    padding-inline: .42rem;
+    white-space: nowrap;
+  }
+}
+
+/* Ajustes finales de navegación móvil: ancho intrínseco para Historial y sección activa. */
+@media (max-width: 640px) {
+  .siteHeader .mainNav,
+  body.chat-route .siteHeader .mainNav {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .siteHeader .mainNav__link,
+  body.chat-route .siteHeader .mainNav__link {
+    position: relative;
+    display: inline-flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    text-align: center;
+  }
+  .siteHeader .mainNav__link--active::before,
+  body.chat-route .siteHeader .mainNav__link--active::before {
+    content: "";
+    width: .34rem;
+    height: .34rem;
+    flex: 0 0 .34rem;
+    margin-right: .22rem;
+    border-radius: 50%;
+    background: #dfff00;
+    box-shadow: 0 0 .45rem rgba(223, 255, 0, .85);
+  }
+  body.chat-route .siteHeader .headerControls {
+    grid-template-columns: max-content repeat(3, minmax(0, 1fr)) !important;
+  }
+  body.chat-route .siteHeader .headerControls .historyToggle {
+    width: max-content !important;
+    min-width: 0 !important;
+    max-width: max-content;
+    justify-self: start !important;
+    padding-inline: .35rem;
+  }
+}
+
+/* La portada solo muestra Tema; los controles de conversación viven en Chat. */
+@media (max-width: 640px) {
+  body:not(.chat-route) .siteHeader .mainNav {
+    grid-column: 1;
+    grid-row: 2;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
+  body:not(.chat-route) .siteHeader .headerControls {
+    grid-column: 1;
+    grid-row: 3;
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: .12rem;
+  }
+  body:not(.chat-route) .siteHeader .headerHistoryToggle,
+  body:not(.chat-route) .siteHeader [data-sound-toggle],
+  body:not(.chat-route) .siteHeader [data-recommendation-toggle] {
+    display: none !important;
+  }
+  body.chat-route .siteHeader .headerControls {
+    grid-template-columns: max-content repeat(3, minmax(0, 1fr)) !important;
+  }
+  body.chat-route .siteHeader .headerControls .historyToggle {
+    display: inline-flex;
+    width: max-content !important;
+    min-width: 0 !important;
+    max-width: max-content;
+    justify-self: start !important;
+    padding-inline: .35rem;
+    white-space: nowrap;
+  }
+}
+
+/* En Inicio y Acerca de deja Sonidos y Tema; Historial y Aventura son del Chat. */
+@media (max-width: 640px) {
+  body:not(.chat-route) .siteHeader .headerControls {
+    grid-template-columns: repeat(2, max-content);
+    justify-content: center;
+    gap: .3rem;
+  }
+  body:not(.chat-route) .siteHeader .headerControls [data-sound-toggle] {
+    display: inline-flex !important;
+  }
+}
+
+/* Inicio y Acerca de reutilizan las mismas cuatro posiciones del Chat. */
+@media (max-width: 640px) {
+  body:not(.chat-route) .siteHeader .headerControls {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    justify-content: stretch;
+    gap: .18rem;
+  }
+  body:not(.chat-route) .siteHeader .headerControls .soundToggle {
+    grid-column: 2;
+    width: 100%;
+    min-width: 0;
+    min-height: 2.05rem;
+    padding: .2rem .12rem;
+    justify-self: stretch;
+  }
+  body:not(.chat-route) .siteHeader .headerControls [data-theme-toggle] {
+    grid-column: 3;
+    width: 100%;
+    min-width: 0;
+    min-height: 2.05rem;
+    padding: .2rem .12rem;
+    justify-self: stretch;
+  }
+}
+
+/* En escritorio, reparte por igual el espacio entre marca, navegación y controles. */
+@media (min-width: 1100px) {
+  .siteHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(1.25rem, 2.2vw, 2rem);
+  }
+  .siteHeader .brand,
+  .siteHeader .mainNav,
+  .siteHeader .headerControls {
+    flex: 0 0 auto;
+  }
+  .siteHeader .mainNav { gap: .25rem; }
+  .siteHeader .headerControls { justify-self: auto; }
+}

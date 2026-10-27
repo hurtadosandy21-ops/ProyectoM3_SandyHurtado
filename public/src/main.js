@@ -42,6 +42,20 @@ soundToggle?.addEventListener("click", () => {
 });
 updateSoundToggle();
 
+const recommendationToggle = document.querySelector("[data-recommendation-toggle]");
+const recommendationDialog = document.getElementById("recommendationDialog");
+document.querySelector("[data-recommendation-toggle]")?.addEventListener("click", () => {
+  if (!recommendationDialog?.open) recommendationDialog?.showModal();
+  recommendationToggle?.setAttribute("aria-expanded", String(Boolean(recommendationDialog?.open)));
+});
+document.querySelector("[data-close-recommendations]")?.addEventListener("click", () => recommendationDialog?.close());
+document.querySelectorAll("[data-recommendation-choice]").forEach((link) => {
+  link.addEventListener("click", () => recommendationDialog?.close());
+});
+recommendationDialog?.addEventListener("close", () => recommendationToggle?.setAttribute("aria-expanded", "false"));
+recommendationDialog?.addEventListener("click", (event) => {
+  if (event.target === recommendationDialog) recommendationDialog.close();
+});
+
 setupLinkInterception();
-window.addEventListener("popstate", router);
 router();

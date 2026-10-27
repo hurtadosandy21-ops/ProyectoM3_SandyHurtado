@@ -9,6 +9,11 @@ const MAX_CONVERSATIONS = 30;
 const GREETING = "¡Hola! Soy Doraemon 🔔 ¿En qué te puedo ayudar hoy? ¡Tengo muchos inventos en mi bolsillo!";
 const AVATAR_IMG = "/src/assets/img/avatar.jpg";
 const GADGET_REGEX = /tatat[aá]+n?|tan,? tan,? tan/i; // respaldo si Gemini olvida la etiqueta
+const RECOMMENDATION_PROMPTS = {
+  capitulo: "Doraemon, recomiéndame un capítulo de la serie. Empieza con `Título: [título]` en una línea y luego da un resumen breve solo si recuerdas los datos con seguridad; si no, dilo y sugiere una aventura por tema sin inventar datos. No inventes enlaces ni disponibilidad en plataformas.",
+  pelicula: "Doraemon, recomiéndame una película de la serie. Empieza con `Título: [título]` en una línea y luego da una descripción breve solo si recuerdas los datos con seguridad; si no, dilo y sugiere una aventura por tema sin inventar datos. No inventes enlaces ni disponibilidad en plataformas.",
+  tema: "Doraemon, propón un tema divertido para conversar y vivir una pequeña aventura. Pregúntame qué tipo de historias o actividades me gustan para adaptar la idea a mis preferencias.",
+};
 const TOPICS = {
   ideas: { label: "Ideas prácticas", greeting: "¡Hola! Soy Doraemon 🔔 Cuéntame qué quieres resolver y buscaremos una idea práctica, paso a paso." },
   inventos: { label: "Inventos del futuro", greeting: "¡Hola! Soy Doraemon 🔔 ¿Qué problema o sueño tienes? ¡Mi bolsillo tiene inventos del futuro para ayudarnos!" },
@@ -86,6 +91,38 @@ function buildGadgetFigure(gadget) {
   return figure;
 }
 
+function addYouTubeSearchActions(bubble, answer, recommendationType) {
+  const typeLabel = recommendationType === "pelicula" ? "película" : "capítulo";
+  const titleMatch = answer.match(/^\s*Título\s*:\s*["“*]?([^\n"”*]+)/im);
+  const searchTerms = titleMatch?.[1]?.trim() || answer.replace(/\s+/g, " ").slice(0, 180);
+  const searchUrl = new URL("https://www.youtube.com/results");
+  searchUrl.searchParams.set("search_query", `Doraemon ${typeLabel} ${searchTerms}`);
+
+  const actions = document.createElement("div");
+  actions.className = "recommendationLinks";
+  const openLink = document.createElement("a");
+  openLink.href = searchUrl.href;
+  openLink.target = "_blank";
+  openLink.rel = "noopener noreferrer";
+  openLink.textContent = "Buscar en YouTube";
+
+  const copyButton = document.createElement("button");
+  copyButton.type = "button";
+  copyButton.textContent = "Copiar enlace";
+  copyButton.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(searchUrl.href);
+      copyButton.textContent = "Enlace copiado";
+    } catch {
+      copyButton.textContent = "No se pudo copiar";
+    }
+  });
+
+  const note = document.createElement("small");
+  note.textContent = "Se abrirán resultados de búsqueda; revisa que el video esté disponible y sea oficial.";
+  actions.append(openLink, copyButton, note);
+  bubble.appendChild(actions);
+}
 function makeId() {
   return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
@@ -171,7 +208,10 @@ function selectConversation(conversation) {
   } catch {}
 }
 
-export function renderChat({ topic: requestedTopic } = {}) {
+export function renderChat({ topic: requestedTopic, recommendation: requestedRecommendation } = {}) {
+  let recommendationLinkPending = requestedRecommendation === "capitulo" || requestedRecommendation === "pelicula";
+  let editingMessageIndex = null;
+  let historyBeforeEdit = null;
   if (isKnownTopic(requestedTopic)) {
     activeTopic = requestedTopic;
     activeConversation.topic = activeTopic;
@@ -197,7 +237,6 @@ export function renderChat({ topic: requestedTopic } = {}) {
           </div>
         </div>
         <div class="chatActions">
-          <button type="button" class="iconBtn historyToggle" id="historyToggle" aria-expanded="false" aria-controls="historyPanel" aria-label="Ver historial de conversaciones">☷ <span>Historial</span></button>
           <button type="button" class="chatHeader__clear" id="clearChat">Limpiar</button>
         </div>
       </header>
@@ -215,6 +254,7 @@ export function renderChat({ topic: requestedTopic } = {}) {
           <form class="chatComposer" id="composer" autocomplete="off">
             <input class="chatComposer__input" id="input" type="text" maxlength="1000"
                    placeholder="Escribe tu mensaje..." aria-label="Mensaje" />
+            <button class="chatComposer__cancel is-hidden" id="cancelEdit" type="button">Cancelar</button>
             <button class="chatComposer__send" id="send" type="submit">Enviar</button>
           </form>
         </div>
@@ -237,6 +277,7 @@ export function renderChat({ topic: requestedTopic } = {}) {
   const form = document.getElementById("composer");
   const input = document.getElementById("input");
   const sendBtn = document.getElementById("send");
+  const cancelEditBtn = document.getElementById("cancelEdit");
   const historyToggle = document.getElementById("historyToggle");
   const historyPanel = document.getElementById("historyPanel");
   const historyBackdrop = document.getElementById("historyBackdrop");
@@ -271,20 +312,73 @@ export function renderChat({ topic: requestedTopic } = {}) {
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
-  function addBubble(text, type, { gadget = null } = {}) {
+  function resetEditMode({ clearInput = true } = {}) {
+    editingMessageIndex = null;
+    sendBtn.textContent = "Enviar";
+    input.placeholder = "Escribe tu mensaje...";
+    cancelEditBtn.classList.add("is-hidden");
+    if (clearInput) input.value = "";
+  }
+
+  function beginMessageEdit(index, text) {
+    if (isSending) return;
+    editingMessageIndex = index;
+    input.value = text;
+    input.placeholder = "Edita tu mensaje...";
+    sendBtn.textContent = "Guardar";
+    cancelEditBtn.classList.remove("is-hidden");
+    input.focus();
+  }
+
+  function addBubble(text, type, { gadget = null, historyIndex = null } = {}) {
     const div = document.createElement("div");
     div.className = `message message--${type}`;
-
     const span = document.createElement("span");
-    span.textContent = text; // textContent evita inyección de HTML
+    span.className = "message__text";
+    span.textContent = text;
     div.appendChild(span);
     if (gadget) div.appendChild(buildGadgetFigure(gadget));
 
+    if (Number.isInteger(historyIndex)) {
+      const actions = document.createElement("div");
+      actions.className = "messageActions";
+      const copyButton = document.createElement("button");
+      copyButton.type = "button";
+      copyButton.textContent = "Copiar";
+      copyButton.setAttribute("aria-label", "Copiar mensaje");
+      copyButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(text);
+          copyButton.textContent = "Copiado";
+        } catch {
+          copyButton.textContent = "No se pudo copiar";
+        }
+      });
+      actions.appendChild(copyButton);
+      if (type === "user") {
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.textContent = "Editar";
+        editButton.setAttribute("aria-label", "Editar este mensaje");
+        editButton.addEventListener("click", () => beginMessageEdit(historyIndex, text));
+        actions.appendChild(editButton);
+      }
+      div.appendChild(actions);
+    }
     messagesEl.appendChild(div);
     scrollToBottom();
     return div;
   }
 
+  function paintHistoryMessages() {
+    messagesEl.replaceChildren();
+    history.forEach((message, index) =>
+      addBubble(message.text, message.role === "user" ? "user" : "character", {
+        gadget: message.gadget ?? null,
+        historyIndex: index,
+      })
+    );
+  }
   function showTyping() {
     const div = document.createElement("div");
     div.className = "message message--character message--typing";
@@ -298,20 +392,16 @@ export function renderChat({ topic: requestedTopic } = {}) {
     isSending = value;
     input.disabled = value;
     sendBtn.disabled = value;
+    cancelEditBtn.disabled = value;
     if (!value) input.focus();
   }
 
 
   // Pintar historial existente (los inventos también se vuelven a mostrar, sin sonido)
-  history.forEach((m) =>
-    addBubble(m.text, m.role === "user" ? "user" : "character", { gadget: m.gadget ?? null })
-  );
+  paintHistoryMessages();
 
   function updateActiveConversationView() {
-    messagesEl.replaceChildren();
-    history.forEach((message) =>
-      addBubble(message.text, message.role === "user" ? "user" : "character", { gadget: message.gadget ?? null })
-    );
+    paintHistoryMessages();
     if (activeTopic) {
       topicBadge.hidden = false;
       topicBadge.textContent = TOPICS[activeTopic].label;
@@ -358,6 +448,7 @@ export function renderChat({ topic: requestedTopic } = {}) {
       item.append(title, preview, date);
       item.addEventListener("click", () => {
         if (isSending) return;
+        resetEditMode();
         selectConversation(conversation);
         updateActiveConversationView();
         renderConversationList();
@@ -483,10 +574,16 @@ export function renderChat({ topic: requestedTopic } = {}) {
     const text = input.value.trim();
     if (!text || isSending) return;
 
+    if (editingMessageIndex !== null) {
+      historyBeforeEdit = history;
+      history = history.slice(0, editingMessageIndex);
+      resetEditMode({ clearInput: false });
+      paintHistoryMessages();
+    }
     input.value = "";
     history.push({ role: "user", text });
     saveHistory();
-    addBubble(text, "user");
+    addBubble(text, "user", { historyIndex: history.length - 1 });
     if (!historyPanel.hidden) renderConversationList();
 
     setSending(true);
@@ -522,13 +619,25 @@ export function renderChat({ topic: requestedTopic } = {}) {
       }
 
       typing.remove();
-      addBubble(reply, "character", { gadget });
+      const replyBubble = addBubble(reply, "character", { gadget, historyIndex: history.length - 1 });
+      if (recommendationLinkPending) {
+        addYouTubeSearchActions(replyBubble, reply, requestedRecommendation);
+        recommendationLinkPending = false;
+      }
+      historyBeforeEdit = null;
       if (gadget && SOUND_AT_REVEAL) playEffect("gadget");
     } catch (error) {
       typing.remove();
       addBubble(error.message, "error");
-      history.pop(); // para poder reintentar sin duplicar
-      saveHistory();
+      if (historyBeforeEdit) {
+        history = historyBeforeEdit;
+        historyBeforeEdit = null;
+        saveHistory();
+        paintHistoryMessages();
+      } else {
+        history.pop(); // para poder reintentar sin duplicar
+        saveHistory();
+      }
       if (!historyPanel.hidden) renderConversationList();
       input.value = text;
     } finally {
@@ -536,14 +645,26 @@ export function renderChat({ topic: requestedTopic } = {}) {
     }
   });
 
+  cancelEditBtn.addEventListener("click", () => resetEditMode());
+
   document.getElementById("clearChat").addEventListener("click", () => {
     if (isSending) return;
+    resetEditMode();
     history = [{ role: "model", text: greetingFor(activeTopic) }];
     saveHistory();
     messagesEl.innerHTML = "";
-    addBubble(history[0].text, "character");
+    addBubble(history[0].text, "character", { historyIndex: 0 });
     if (!historyPanel.hidden) renderConversationList();
   });
 
-  input.focus();
+  const recommendationPrompt = Object.hasOwn(RECOMMENDATION_PROMPTS, requestedRecommendation)
+    ? RECOMMENDATION_PROMPTS[requestedRecommendation]
+    : null;
+  if (recommendationPrompt) {
+    input.value = recommendationPrompt;
+    window.history.replaceState(null, "", window.location.pathname + window.location.hash);
+    queueMicrotask(() => form.requestSubmit());
+  } else {
+    input.focus();
+  }
 }

@@ -11,16 +11,17 @@
 </head>
 <body>
   <header class="siteHeader">
-    <a class="brand" href="/" aria-label="Doraemon Chat, ir al inicio">
-      <span class="brand__mark" aria-hidden="true">🔔</span>
+    <div class="brand" aria-label="Doraemon Chat">
+      <span class="brand__mark" aria-hidden="true">✨</span>
       <span class="brand__name">Doraemon <span>Chat</span></span>
-    </a>
+    </div>
     <nav class="mainNav" aria-label="Navegación principal">
       <a class="mainNav__link" href="/">Inicio</a>
       <a class="mainNav__link" href="/chat">Chat</a>
       <a class="mainNav__link" href="/about">Acerca de</a>
     </nav>
     <div class="headerControls">
+      <button type="button" class="themeToggle historyToggle headerHistoryToggle" id="historyToggle" aria-expanded="false" aria-controls="historyPanel" aria-label="Ver historial de conversaciones">☷ <span>Historial</span></button>
       <button class="themeToggle soundToggle" type="button" data-sound-toggle aria-label="Efectos de sonido" aria-pressed="true" title="Silenciar efectos de sonido">
         <span data-sound-icon aria-hidden="true">🔊</span><span data-sound-label>Sonidos</span>
       </button>
@@ -29,9 +30,37 @@
       <svg class="themeToggle__sun" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" /></svg>
       <span data-theme-label>Modo oscuro</span>
     </button>
+      <button class="themeToggle recommendationToggle" type="button" data-recommendation-toggle aria-haspopup="dialog" aria-controls="recommendationDialog" aria-label="Elegir recomendación de aventura" title="Elegir recomendación de aventura">
+        <span aria-hidden="true">🔔</span><span data-recommendation-label>Aventura</span>
+      </button>
     </div>
   </header>
 
+  <dialog class="confirmDialog soundNoticeDialog" id="soundNoticeDialog" aria-labelledby="soundNoticeTitle" aria-describedby="soundNoticeMessage">
+    <div class="confirmDialog__content">
+      <p class="eyebrow"><span class="eyebrow__dot"></span> Antes de comenzar</p>
+      <h2 id="soundNoticeTitle">Este chat tiene sonidos</h2>
+      <p id="soundNoticeMessage">Los efectos no suenan durante toda la conversación: se reproducen cuando Doraemon presenta un artefacto. Si quieres probarlos, pídele que te muestre uno. Puedes silenciar o volver a activar los efectos con el botón <strong>Sonidos</strong>, en la barra de controles; en móvil aparece en la segunda fila de la navegación y en pantallas grandes, arriba.</p>
+      <label class="confirmDialog__remember"><input type="checkbox" id="rememberSoundNotice" /> No volver a mostrar este aviso</label>
+      <div class="confirmDialog__actions">
+        <button type="button" class="confirmDialog__cancel" id="cancelSoundNotice">Ahora no</button>
+        <button type="button" class="confirmDialog__continue" id="continueSoundNotice">Entrar al chat</button>
+      </div>
+    </div>
+  </dialog>
+  <dialog class="confirmDialog recommendationDialog" id="recommendationDialog" aria-labelledby="recommendationTitle" aria-describedby="recommendationDescription">
+    <div class="confirmDialog__content">
+      <p class="eyebrow"><span class="eyebrow__dot"></span> Una nueva aventura</p>
+      <h2 id="recommendationTitle">¿Qué te gustaría descubrir?</h2>
+      <p id="recommendationDescription">Elige una opción. Para capítulos y películas podrás buscar el título recomendado en YouTube y copiar el enlace de búsqueda.</p>
+      <nav class="recommendationChoices" aria-label="Tipo de recomendación">
+        <a class="recommendationChoice" data-recommendation-choice href="/chat?recomendacion=capitulo"><span aria-hidden="true">📺</span><span><strong>Un capítulo</strong><small>Una historia de Doraemon para ver</small></span><span aria-hidden="true">›</span></a>
+        <a class="recommendationChoice" data-recommendation-choice href="/chat?recomendacion=pelicula"><span aria-hidden="true">🎬</span><span><strong>Una película</strong><small>Una aventura para disfrutar</small></span><span aria-hidden="true">›</span></a>
+        <a class="recommendationChoice" data-recommendation-choice href="/chat?recomendacion=tema"><span aria-hidden="true">✨</span><span><strong>Un tema para conversar</strong><small>Una aventura según tus intereses</small></span><span aria-hidden="true">›</span></a>
+      </nav>
+      <div class="confirmDialog__actions"><button type="button" class="confirmDialog__cancel" data-close-recommendations>Cerrar</button></div>
+    </div>
+  </dialog>
   <main id="app" tabindex="-1" aria-live="polite"></main>
 
   <footer class="siteFooter">

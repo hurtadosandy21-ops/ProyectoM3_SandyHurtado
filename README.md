@@ -29,7 +29,8 @@ La experiencia busca sentirse cercana, amable y divertida: Doraemon escucha lo q
 - **Conversar con contexto:** el servidor envía a Gemini el historial reciente de la conversación y las instrucciones del tema seleccionado.
 - **Descubrir inventos:** si Doraemon propone uno, primero aparece su explicación y después su imagen o distintivo.
 - **Guardar conversaciones:** crear chats, volver a abrirlos, eliminar uno o vaciar el historial desde un panel lateral que solo aparece al pulsar **Historial**. En móvil, el panel se superpone al chat para conservar el espacio. Las conversaciones se guardan en el navegador actual, hasta 30; no se sincronizan entre dispositivos.
-- **Personalizar la experiencia:** alternar entre modo claro y oscuro y activar o silenciar los efectos desde **Sonidos**, junto al control de tema en la barra superior.
+- **Disfrutar de efectos puntuales:** el sonido aparece cuando Doraemon presenta un artefacto, no durante toda la conversación. Puedes probarlo pidiéndole que te muestre un invento y activar o silenciar los efectos desde **Sonidos**, junto al control de tema.
+- **Pedir una recomendación con la campana:** elige un capítulo, una película o un tema de conversación y Doraemon recibirá la petición automáticamente. Para capítulos y películas, puedes abrir una búsqueda en YouTube o copiar su enlace; revisa que el resultado esté disponible y provenga de un canal autorizado.
 - **Usarla desde distintos tamaños de pantalla:** el diseño se adapta a celular, tablet y laptop; el desplazamiento de los mensajes queda dentro del panel del chat en estos tamaños.
 - **Navegar sin recargar:** Inicio, Chat y Acerca de usan rutas de una SPA y admiten los botones atrás y adelante del navegador.
 
@@ -40,11 +41,13 @@ La portada intenta reproducir la música de introducción al entrar. Algunos nav
 ## Cómo se usa
 
 1. Abre la [aplicación de Doraemon Chat](https://proyectom3sandyhurtado.vercel.app/).
-2. Al entrar, la portada intenta reproducir la música de introducción. Puedes esperar a que termine o tocar la imagen de Doraemon o **Saltar intro** para mostrar **Empezar a chatear** de inmediato; al omitirla, la música se detiene. Si el navegador bloquea el audio, el botón también queda disponible. Además, puedes entrar desde **Chat** en la barra de navegación.
+2. Al entrar, la portada intenta reproducir la música de introducción. Puedes esperar a que termine, hacer clic o tocar la imagen de Doraemon, o pulsar **Saltar intro** para mostrar **Empezar a chatear** de inmediato; al omitir la introducción, la música se detiene. Si el navegador bloquea el audio, el botón también queda disponible. También puedes entrar desde **Chat** en la barra de navegación.
 3. Para iniciar con un tema específico, elige una de las tarjetas de la portada: **Ideas prácticas**, **Inventos del futuro** o **Una charla amable**. Cada tarjeta abre el chat con ese enfoque.
-4. Escribe tu pregunta en el campo de mensaje y pulsa **Enviar**. Doraemon responderá en español y, si corresponde, presentará un invento después de explicar cómo puede ayudarte.
-5. Pulsa **Historial**, en el encabezado del chat, para abrir el panel de conversaciones a la izquierda. Elige una charla anterior o usa **+ Nueva**. También puedes borrar una conversación o vaciar el historial; la aplicación te pedirá confirmación, salvo que hayas elegido no volver a mostrarla. En móvil, toca fuera del panel para cerrarlo.
-6. Usa **Sonidos**, junto al botón de tema en la barra superior, para activar o silenciar los efectos del chat. La música de introducción se controla desde la portada. El botón de tema alterna entre modo claro y oscuro.
+4. Escribe tu pregunta y pulsa **Enviar**. Puedes copiar cualquier mensaje y editar los tuyos; al guardar una edición, Doraemon vuelve a responder desde ese mensaje. Si corresponde, presentará un invento después de explicar cómo puede ayudarte.
+5. Pulsa **Historial** en la navegación del chat para abrir el panel de conversaciones a la izquierda; en móvil, aparece en la segunda fila de la barra superior. Elige una charla anterior o usa **+ Nueva**. También puedes borrar una conversación o vaciar el historial; la aplicación te pedirá confirmación, salvo que hayas elegido no volver a mostrarla. En móvil, toca fuera del panel para cerrarlo.
+6. Antes de entrar, aparecerá un aviso sobre los efectos: suenan cuando Doraemon presenta un artefacto, no durante toda la conversación. Para probarlos, pídele que te muestre uno. Usa **Sonidos** para activarlos o silenciarlos; en móvil, está en la segunda fila de la navegación del chat.
+7. En el chat, pulsa **Aventura** para elegir un capítulo, una película o un tema. Doraemon recibirá la petición automáticamente. Si pides un capítulo o una película, Doraemon añadirá **Buscar en YouTube** y **Copiar enlace**: ambos usan el título recomendado para buscar resultados, así que comprueba la disponibilidad y el canal antes de reproducirlos.
+8. En móvil, Inicio, Chat y Acerca de quedan en la primera fila de la barra. En Inicio y Acerca de, el control compacto de tema queda en una segunda fila; en el chat, Sonidos, Historial, Aventura y Tema aparecen allí. Aventura e Historial solo aparecen en Chat. En tablet y laptop se conserva el diseño existente. La música de introducción se controla desde la portada; puedes marcar **No volver a mostrar este aviso** antes de entrar.
 
 [↑ Volver al índice](#contenido)
 
@@ -168,6 +171,10 @@ Vitest y Supertest comprueban rutas, validación y servicio. Las llamadas a Gemi
 ## Créditos y propiedad intelectual
 
 Doraemon y los elementos asociados pertenecen a sus respectivos titulares. Este proyecto personal y educativo no es oficial ni está afiliado con ellos.
+
+La canción principal se identifica como *Doraemon no Uta*. La composición es de [Shunsuke Kikuchi](https://columbia.jp/prod-info/COCX-40818-21/info.html); la letra, de Takumi Kusube, con letra complementaria de Susumu Baba. La interpretación japonesa original de 1979 es de [Kumiko Ōsugi](https://columbia.jp/artist-info/ohsugikumiko/prof.html). Para las adaptaciones en español se citan Ana Orra y Noemí Bayarri (España) y Maggie Vera (Latinoamérica), según los [créditos de las versiones regionales](https://doraemon.fandom.com/es/wiki/Canci%C3%B3n_de_Doraemon).
+
+Los derechos de la canción y sus grabaciones pertenecen a sus respectivos titulares. Este proyecto es educativo y sin ánimo de lucro. Los créditos describen la obra y sus versiones; no atribuyen el archivo de audio de la aplicación a una grabación concreta.
 
 [↑ Volver al índice](#contenido)
 
