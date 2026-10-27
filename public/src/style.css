@@ -597,3 +597,65 @@ body.chat-route {
   }
   body.chat-route .chatApp { min-height: 34rem; }
 }
+
+/* Ajustes de escala y alineación del chat en pantallas grandes. */
+body.chat-route .mainNav {
+  width: min(100%, 56rem);
+  margin: 0 auto;
+  padding: 0.45rem 1rem;
+  gap: 0.5rem;
+  border: 0;
+  border-radius: 0 0 1rem 1rem;
+  flex: 0 0 auto;
+}
+body.chat-route .mainNav__link { padding: 0.45rem 0.9rem; font-size: 0.95rem; }
+body.chat-route #app { width: 100%; padding: 0.75rem 1rem 1rem; }
+body.chat-route .chatApp {
+  width: min(100%, 56rem);
+  max-width: 56rem;
+  max-height: none;
+  margin: auto;
+  border-radius: 1.1rem;
+  overflow: hidden;
+  box-shadow: 0 0.75rem 2rem rgba(0, 92, 145, 0.16);
+}
+body.chat-route .chatHeader { padding: 0.8rem 1.15rem; }
+body.chat-route .chatAvatar { width: 3rem; height: 3rem; }
+body.chat-route .chatTitle { font-size: 1.1rem; line-height: 1.25; }
+body.chat-route .chatSubtitle { font-size: 0.78rem; }
+body.chat-route .chatMessages { padding: 1rem 1.15rem; gap: 0.7rem; }
+body.chat-route .message { max-width: min(75%, 42rem); padding: 0.6rem 0.8rem; font-size: 0.92rem; }
+body.chat-route .chatComposer { padding: 0.75rem 1rem; gap: 0.6rem; }
+body.chat-route .chatComposer__input { padding: 0.65rem 0.8rem; font-size: 0.95rem; }
+body.chat-route .chatComposer__send { min-height: 2.75rem; padding: 0.55rem 1rem; font-size: 0.95rem; }
+
+@media (min-width: 1024px) {
+  body.chat-route { overflow: hidden; }
+  body.chat-route #app { min-height: 0; padding: 0.75rem 1rem 1rem; overflow: hidden; }
+  body.chat-route .chatApp { height: 100%; }
+}
+
+/* En móvil dejamos un pequeño margen para conservar los bordes redondeados. */
+@media (max-width: 640px) {
+  body.chat-route .mainNav { width: 100%; padding: 0.35rem 0.4rem; border-radius: 0; }
+  body.chat-route .mainNav__link { padding: 0.45rem 0.75rem; }
+  body.chat-route #app { padding: 0.5rem; }
+  body.chat-route .chatApp { border-radius: 1rem; }
+  body.chat-route .chatHeader { padding: 0.7rem; gap: 0.5rem; }
+  body.chat-route .chatAvatar { width: 2.7rem; height: 2.7rem; }
+  body.chat-route .chatProfile { gap: 0.65rem; }
+  body.chat-route .chatActions { gap: 0.35rem; }
+  body.chat-route .chatHeader__clear { padding: 0.4rem 0.55rem; font-size: 0.8rem; }
+  body.chat-route .chatMessages { padding: 0.75rem; }
+  body.chat-route .message { max-width: 88%; font-size: 0.9rem; }
+  body.chat-route .chatComposer { padding: 0.65rem; }
+  body.chat-route .chatComposer__input { min-height: 2.75rem; font-size: 0.9rem; }
+  body.chat-route .chatComposer__send { min-height: 2.75rem; padding: 0.5rem 0.8rem; }
+}
+
+@media (max-width: 380px) {
+  body.chat-route .chatHeader { flex-wrap: wrap; }
+  body.chat-route .chatProfile { flex: 1 1 100%; }
+  body.chat-route .chatActions { width: 100%; justify-content: flex-end; }
+  body.chat-route .chatSubtitle { max-width: 14rem; }
+}
