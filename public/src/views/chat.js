@@ -1,5 +1,5 @@
 import { sendToDoraemon } from "../services/chatService.js";
-import { playEffect, areEffectsMuted, setEffectsMuted } from "../audio.js";
+import { playEffect } from "../audio.js";
 
 const STORAGE_KEY = "doraemon-chat-history"; // compatibilidad con el historial anterior
 const CONVERSATIONS_KEY = "doraemon-conversations";
@@ -198,18 +198,27 @@ export function renderChat({ topic: requestedTopic } = {}) {
         </div>
         <div class="chatActions">
           <button type="button" class="iconBtn historyToggle" id="historyToggle" aria-expanded="false" aria-controls="historyPanel" aria-label="Ver historial de conversaciones">☷ <span>Historial</span></button>
-          <button type="button" class="iconBtn" id="muteBtn" title="Silenciar o activar los efectos de sonido" aria-label="Silenciar o activar los efectos de sonido">🔊</button>
           <button type="button" class="chatHeader__clear" id="clearChat">Limpiar</button>
         </div>
       </header>
-      <p class="chatSoundNote"><span aria-hidden="true">♫</span> Este chat tiene sonidos; puedes silenciarlos con el botón de sonido.</p>
-      <section class="historyPanel" id="historyPanel" hidden aria-label="Conversaciones anteriores">
-        <div class="historyPanel__heading">
-          <strong>Conversaciones</strong>
-          <div><button type="button" id="clearHistory">Vaciar</button><button type="button" id="newConversation">+ Nueva</button></div>
+      <div class="chatLayout">
+        <section class="historyPanel" id="historyPanel" hidden aria-label="Conversaciones anteriores">
+          <div class="historyPanel__heading">
+            <strong>Conversaciones</strong>
+            <div><button type="button" id="clearHistory">Vaciar</button><button type="button" id="newConversation">+ Nueva</button></div>
+          </div>
+          <div class="historyList" id="historyList"></div>
+        </section>
+        <button type="button" class="historyBackdrop" id="historyBackdrop" aria-label="Cerrar historial" hidden></button>
+        <div class="chatConversation">
+          <div class="chatMessages" id="messages" aria-live="polite"></div>
+          <form class="chatComposer" id="composer" autocomplete="off">
+            <input class="chatComposer__input" id="input" type="text" maxlength="1000"
+                   placeholder="Escribe tu mensaje..." aria-label="Mensaje" />
+            <button class="chatComposer__send" id="send" type="submit">Enviar</button>
+          </form>
         </div>
-        <div class="historyList" id="historyList"></div>
-      </section>
+      </div>
       <dialog class="confirmDialog" id="deleteDialog" aria-labelledby="deleteDialogTitle" aria-describedby="deleteDialogMessage">
         <div class="confirmDialog__content">
           <h2 id="deleteDialogTitle">Eliminar conversación</h2>
@@ -221,12 +230,6 @@ export function renderChat({ topic: requestedTopic } = {}) {
           </div>
         </div>
       </dialog>
-      <div class="chatMessages" id="messages" aria-live="polite"></div>
-      <form class="chatComposer" id="composer" autocomplete="off">
-        <input class="chatComposer__input" id="input" type="text" maxlength="1000"
-               placeholder="Escribe tu mensaje..." aria-label="Mensaje" />
-        <button class="chatComposer__send" id="send" type="submit">Enviar</button>
-      </form>
     </section>
   `;
 
@@ -234,9 +237,9 @@ export function renderChat({ topic: requestedTopic } = {}) {
   const form = document.getElementById("composer");
   const input = document.getElementById("input");
   const sendBtn = document.getElementById("send");
-  const muteBtn = document.getElementById("muteBtn");
   const historyToggle = document.getElementById("historyToggle");
   const historyPanel = document.getElementById("historyPanel");
+  const historyBackdrop = document.getElementById("historyBackdrop");
   const historyList = document.getElementById("historyList");
   const topicBadge = document.getElementById("chatTopic");
   const deleteDialog = document.getElementById("deleteDialog");
@@ -254,6 +257,16 @@ export function renderChat({ topic: requestedTopic } = {}) {
     avatarImg.replaceWith(fallback);
   });
 
+  function setHistoryOpen(isOpen) {
+    historyPanel.hidden = !isOpen;
+    historyBackdrop.hidden = !isOpen;
+    historyToggle.setAttribute("aria-expanded", String(isOpen));
+  }
+
+  historyBackdrop.addEventListener("click", () => {
+    setHistoryOpen(false);
+    historyToggle.focus();
+  });
   function scrollToBottom() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -288,15 +301,11 @@ export function renderChat({ topic: requestedTopic } = {}) {
     if (!value) input.focus();
   }
 
-  function updateMuteBtn() {
-    muteBtn.textContent = areEffectsMuted() ? "🔇" : "🔊";
-  }
 
   // Pintar historial existente (los inventos también se vuelven a mostrar, sin sonido)
   history.forEach((m) =>
     addBubble(m.text, m.role === "user" ? "user" : "character", { gadget: m.gadget ?? null })
   );
-  updateMuteBtn();
 
   function updateActiveConversationView() {
     messagesEl.replaceChildren();
@@ -352,6 +361,7 @@ export function renderChat({ topic: requestedTopic } = {}) {
         selectConversation(conversation);
         updateActiveConversationView();
         renderConversationList();
+        setHistoryOpen(false);
       });
 
       const remove = document.createElement("button");
@@ -417,16 +427,14 @@ export function renderChat({ topic: requestedTopic } = {}) {
     updateActiveConversationView();
     renderConversationList();
     if (getPreviousConversations().length === 0) {
-      historyPanel.hidden = true;
-      historyToggle.setAttribute("aria-expanded", "false");
+      setHistoryOpen(false);
     }
   }
 
   historyToggle.addEventListener("click", () => {
-    const isOpen = !historyPanel.hidden;
-    historyPanel.hidden = isOpen;
-    historyToggle.setAttribute("aria-expanded", String(!isOpen));
-    if (!isOpen) renderConversationList();
+    const isOpen = historyPanel.hidden;
+    setHistoryOpen(isOpen);
+    if (isOpen) renderConversationList();
   });
 
   document.getElementById("newConversation").addEventListener("click", () => {
@@ -439,6 +447,7 @@ export function renderChat({ topic: requestedTopic } = {}) {
     try { sessionStorage.setItem(ACTIVE_CONVERSATION_KEY, activeConversationId); } catch {}
     updateActiveConversationView();
     renderConversationList();
+    setHistoryOpen(false);
   });
 
   document.getElementById("clearHistory").addEventListener("click", () => {
@@ -468,10 +477,6 @@ export function renderChat({ topic: requestedTopic } = {}) {
     }
   });
 
-  muteBtn.addEventListener("click", () => {
-    setEffectsMuted(!areEffectsMuted());
-    updateMuteBtn();
-  });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();

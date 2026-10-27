@@ -28,9 +28,9 @@ La experiencia busca sentirse cercana, amable y divertida: Doraemon escucha lo q
 - **Elegir el estilo de la charla:** empezar con ideas prácticas, inventos del futuro o una conversación amable. Cada opción prepara el chat con un enfoque distinto.
 - **Conversar con contexto:** el servidor envía a Gemini el historial reciente de la conversación y las instrucciones del tema seleccionado.
 - **Descubrir inventos:** si Doraemon propone uno, primero aparece su explicación y después su imagen o distintivo.
-- **Guardar conversaciones:** crear chats, volver a abrirlos, eliminar uno o vaciar el historial. Se guardan en el navegador actual, hasta 30 conversaciones; no se sincronizan entre dispositivos.
-- **Personalizar la experiencia:** alternar entre modo claro y oscuro, y activar o silenciar los sonidos.
-- **Usarla desde distintos tamaños de pantalla:** el diseño se adapta a celular, tablet y laptop. En laptop y tablet el scroll de los mensajes queda dentro del panel del chat.
+- **Guardar conversaciones:** crear chats, volver a abrirlos, eliminar uno o vaciar el historial desde un panel lateral que solo aparece al pulsar **Historial**. En móvil, el panel se superpone al chat para conservar el espacio. Las conversaciones se guardan en el navegador actual, hasta 30; no se sincronizan entre dispositivos.
+- **Personalizar la experiencia:** alternar entre modo claro y oscuro y activar o silenciar los efectos desde **Sonidos**, junto al control de tema en la barra superior.
+- **Usarla desde distintos tamaños de pantalla:** el diseño se adapta a celular, tablet y laptop; el desplazamiento de los mensajes queda dentro del panel del chat en estos tamaños.
 - **Navegar sin recargar:** Inicio, Chat y Acerca de usan rutas de una SPA y admiten los botones atrás y adelante del navegador.
 
 La portada intenta reproducir la música de introducción al entrar. Algunos navegadores bloquean el audio automático; en ese caso se puede activar manualmente desde el control de música.
@@ -43,8 +43,8 @@ La portada intenta reproducir la música de introducción al entrar. Algunos nav
 2. Al entrar, la portada intenta reproducir la música de introducción. Puedes esperar a que termine o tocar la imagen de Doraemon o **Saltar intro** para mostrar **Empezar a chatear** de inmediato; al omitirla, la música se detiene. Si el navegador bloquea el audio, el botón también queda disponible. Además, puedes entrar desde **Chat** en la barra de navegación.
 3. Para iniciar con un tema específico, elige una de las tarjetas de la portada: **Ideas prácticas**, **Inventos del futuro** o **Una charla amable**. Cada tarjeta abre el chat con ese enfoque.
 4. Escribe tu pregunta en el campo de mensaje y pulsa **Enviar**. Doraemon responderá en español y, si corresponde, presentará un invento después de explicar cómo puede ayudarte.
-5. Abre **Historial** para volver a una conversación o pulsa **+ Nueva** para iniciar otra. Desde ahí puedes borrar una conversación o vaciar el historial; la aplicación te pedirá confirmación, salvo que hayas elegido no volver a mostrarla.
-6. En el chat, el botón de sonido activa o silencia los efectos. La música de introducción se controla desde la portada. Usa el botón de tema en la barra de navegación para alternar entre modo claro y oscuro.
+5. Pulsa **Historial**, en el encabezado del chat, para abrir el panel de conversaciones a la izquierda. Elige una charla anterior o usa **+ Nueva**. También puedes borrar una conversación o vaciar el historial; la aplicación te pedirá confirmación, salvo que hayas elegido no volver a mostrarla. En móvil, toca fuera del panel para cerrarlo.
+6. Usa **Sonidos**, junto al botón de tema en la barra superior, para activar o silenciar los efectos del chat. La música de introducción se controla desde la portada. El botón de tema alterna entre modo claro y oscuro.
 
 [↑ Volver al índice](#contenido)
 
