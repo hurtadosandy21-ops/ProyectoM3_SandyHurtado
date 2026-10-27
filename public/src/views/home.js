@@ -8,50 +8,65 @@ import {
 } from "../audio.js";
 
 const HERO_IMG = "/src/assets/img/portada.jpg";
-const INTRO_DONE_KEY = "doraemon-intro-done";
-const HINT_WAITING = "🎵 Haz clic en cualquier parte para escuchar la intro. El botón aparecerá al terminar.";
-const HINT_PLAYING = "🎵 Sonando la intro… el botón aparecerá al terminar.";
+const HINT_WAITING = "Intentando reproducir la intro. Si tu navegador bloquea el inicio automático, toca «Activar música» o salta la intro.";
+const HINT_PLAYING = "La música de introducción está sonando. Puedes desactivarla cuando quieras.";
 
-function wasIntroHeard() {
-  try {
-    return sessionStorage.getItem(INTRO_DONE_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
 
 export function renderHome() {
   const app = document.querySelector("#app");
   app.innerHTML = `
-    <section class="view view--home hero">
-      <button type="button" class="musicBtn" id="musicBtn">🎵 Activar música</button>
+    <section class="view view--home hero pageShell">
+      <div class="heroCopy heroCopy--heading">
+        <p class="eyebrow"><span class="eyebrow__dot"></span> Un amigo del futuro</p>
+        <h1>Una idea nueva puede <span>cambiarlo todo.</span></h1>
+      </div>
 
-      <div class="heroStage" id="heroStage">
-        <img class="hero__img" src="${HERO_IMG}" alt="Doraemon" />
-        <div class="heroStage__overlay">
-          <a class="btn btn--primary is-hidden" id="startBtn" href="/chat">Empezar a chatear</a>
+      <figure class="heroStage" id="heroStage">
+        <div class="heroStage__frame">
+          <img class="hero__img" src="${HERO_IMG}" alt="Doraemon, el amigo robot del futuro" />
+          <div class="heroStage__overlay">
+            <span class="heroStage__badge"><span aria-hidden="true">●</span> Listo para conversar</span>
+            <a class="btn btn--primary is-hidden" id="startBtn" href="/chat">Empezar a chatear <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <figcaption><span class="heroStage__captionMark" aria-hidden="true">🔔</span> Tu compañero cósmico, siempre cerca.</figcaption>
+      </figure>
+
+      <div class="heroCopy heroCopy--details">
+        <p class="heroCopy__text">
+          Comparte lo que tienes en mente con Doraemon. Su bolsillo mágico siempre guarda
+          una idea, un invento o unas palabras que pueden ayudarte.
+        </p>
+        <div class="heroFeatures" aria-label="Elige cómo empezar">
+          <a href="/chat?tema=ideas"><b aria-hidden="true">✦</b> Ideas prácticas <span aria-hidden="true">↗</span></a>
+          <a href="/chat?tema=inventos"><b aria-hidden="true">✦</b> Inventos del futuro <span aria-hidden="true">↗</span></a>
+          <a href="/chat?tema=charla"><b aria-hidden="true">✦</b> Una charla amable <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="introPanel" id="introGate">
+          <div class="introPanel__controls">
+            <button type="button" class="musicBtn" id="musicBtn">
+              <span aria-hidden="true">♫</span> Activar música
+            </button>
+            <button type="button" class="skipBtn" id="skipBtn">Saltar intro</button>
+          </div>
+          <p class="introHint" id="introHint">${HINT_WAITING}</p>
         </div>
       </div>
-
-      <h1>Chatea con Doraemon</h1>
-      <p>El robot gato del futuro tiene inventos para ti en su bolsillo mágico</p>
-
-      <div id="introGate">
-        <p class="introHint" id="introHint">${HINT_WAITING}</p>
-        <button type="button" class="skipBtn" id="skipBtn">Saltar intro</button>
-      </div>
+    </section>
+    <section class="welcomeStrip pageShell" aria-label="Bienvenida">
+      <span class="welcomeStrip__icon" aria-hidden="true">✧</span>
+      <p><strong>¿Qué te gustaría resolver hoy?</strong><span>Empieza una conversación y descubre qué guarda Doraemon en su bolsillo.</span></p>
+      <a href="/chat" class="welcomeStrip__link">Conocer el chat <span aria-hidden="true">↗</span></a>
     </section>
   `;
 
   const stage = document.getElementById("heroStage");
   const img = stage.querySelector(".hero__img");
   const musicBtn = document.getElementById("musicBtn");
-  const gate = document.getElementById("introGate");
   const hint = document.getElementById("introHint");
   const skipBtn = document.getElementById("skipBtn");
   const startBtn = document.getElementById("startBtn");
 
-  // Si la imagen falla, queda un recuadro para que el botón no se pierda
   img.addEventListener("error", () => {
     console.warn(`[img] No se pudo cargar ${HERO_IMG}. Revisa el nombre y la carpeta.`);
     img.remove();
@@ -61,42 +76,62 @@ export function renderHome() {
   let introDone = false;
 
   function updateMusicBtn() {
-    if (isIntroPlaying()) musicBtn.textContent = "⏸️ Pausar música";
-    else musicBtn.textContent = introDone ? "🔁 Escuchar de nuevo" : "🎵 Activar música";
+    if (isIntroPlaying()) {
+      musicBtn.innerHTML = '<span aria-hidden="true">♫</span> Desactivar música';
+      musicBtn.setAttribute("aria-label", "Desactivar música de introducción");
+    } else {
+      musicBtn.innerHTML = '<span aria-hidden="true">♫</span> Activar música';
+      musicBtn.setAttribute("aria-label", "Activar música de introducción");
+    }
   }
 
   function revealStart() {
     if (introDone) return;
     introDone = true;
-    try {
-      sessionStorage.setItem(INTRO_DONE_KEY, "1");
-    } catch {}
-    gate.classList.add("is-hidden");
+    skipBtn.classList.add("is-hidden");
     startBtn.classList.remove("is-hidden");
     startBtn.classList.add("btn--reveal");
     stage.classList.add("heroStage--revealed");
   }
 
-  // El audio avisa cuando empieza, se pausa, termina o falla
   setIntroListener((type) => {
-    if (!document.body.contains(startBtn)) return; // ya cambiaste de página
-    if (type === "play" && !introDone) hint.textContent = HINT_PLAYING;
-    if (type === "pause" || type === "ended" || type === "error") revealStart();
+    if (!document.body.contains(startBtn)) return;
+    if (type === "play") hint.textContent = HINT_PLAYING;
+    if (type === "pause") {
+      revealStart();
+      hint.textContent = "La música está desactivada. Puedes volver a activarla cuando quieras.";
+    }
+    if (type === "ended") {
+      revealStart();
+      hint.textContent = "La intro terminó. Puedes volver a escucharla cuando quieras.";
+    }
+    if (type === "error") {
+      revealStart();
+      hint.textContent = "No se pudo reproducir la intro. Puedes intentarlo de nuevo con el botón de música.";
+    }
     updateMusicBtn();
   });
 
-  musicBtn.addEventListener("click", () => toggleIntro());
-
+  musicBtn.addEventListener("click", async () => {
+    await toggleIntro();
+    if (!isIntroPlaying() && !introDone) {
+      hint.textContent = "El navegador bloqueó la reproducción automática. Toca «Activar música» para escuchar la intro.";
+    }
+    updateMusicBtn();
+  });
   skipBtn.addEventListener("click", () => {
     stopIntro();
     revealStart();
     updateMusicBtn();
   });
 
-  if (wasIntroHeard() || introFailed()) {
-    revealStart(); // ya la escuchaste en esta sesión, o el audio no cargó
-  } else {
-    startIntro(); // si el navegador lo bloquea, arranca con el primer clic o tecla
+  if (introFailed()) revealStart();
+  else {
+    startIntro().then((started) => {
+      if (!started && !introDone) {
+        hint.textContent = "El navegador puede bloquear la reproducción automática. Toca «Activar música» para escuchar la intro.";
+      }
+    });
   }
   updateMusicBtn();
 }

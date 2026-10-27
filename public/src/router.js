@@ -19,8 +19,14 @@ function updateActiveLink(path) {
 export function router() {
   const path = window.location.pathname;
   document.body.classList.toggle("chat-route", path === "/chat");
+  document.body.classList.toggle("home-route", path === "/");
   const render = routes[path] || renderNotFound;
   stopIntro(); // al cambiar de página siempre se corta la intro; el home la vuelve a iniciar
   updateActiveLink(path);
-  render();
+  if (path === "/chat") {
+    const topic = new URLSearchParams(window.location.search).get("tema");
+    render({ topic });
+  } else {
+    render();
+  }
 }

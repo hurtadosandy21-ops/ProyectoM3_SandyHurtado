@@ -1,19 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Doraemon Chat</title>
-    <link rel="stylesheet" href="/src/style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f2faff" />
+  <meta name="description" content="Conversa con Doraemon, el amigo del futuro. Un chatbot de fans con ideas, inventos y una personalidad amable." />
+  <title>Doraemon Chat | Un amigo del futuro</title>
+  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="stylesheet" href="/src/polish.css" />
 </head>
 <body>
-  <nav class="mainNav">
-    <a class="mainNav__link" href="/">Home</a>
-    <a class="mainNav__link" href="/chat">Chat</a>
-    <a class="mainNav__link" href="/about">About</a>
-  </nav>
+  <header class="siteHeader">
+    <a class="brand" href="/" aria-label="Doraemon Chat, ir al inicio">
+      <span class="brand__mark" aria-hidden="true">🔔</span>
+      <span class="brand__name">Doraemon <span>Chat</span></span>
+    </a>
+    <nav class="mainNav" aria-label="Navegación principal">
+      <a class="mainNav__link" href="/">Inicio</a>
+      <a class="mainNav__link" href="/chat">Chat</a>
+      <a class="mainNav__link" href="/about">Acerca de</a>
+    </nav>
+    <button class="themeToggle" type="button" data-theme-toggle aria-label="Activar modo oscuro" aria-pressed="false">
+      <svg class="themeToggle__moon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20.2 15.4A8.5 8.5 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z" /></svg>
+      <svg class="themeToggle__sun" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" /></svg>
+      <span data-theme-label>Modo oscuro</span>
+    </button>
+  </header>
 
-  <div id="app"></div>
+  <main id="app" tabindex="-1" aria-live="polite"></main>
+
+  <footer class="siteFooter">
+    <p><strong>Doraemon Chat</strong></p>
+    <nav class="socialLinks" aria-label="Perfiles y contacto">
+      <a href="mailto:hurtadosandy21@gmail.com"><span aria-hidden="true">🐧</span> Gmail</a>
+      <a href="https://www.linkedin.com/in/sandy-hurtado-a40aa1421/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">🪄</span> LinkedIn</a>
+      <a href="https://github.com/hurtadosandy21-ops" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">🔔</span> GitHub</a>
+    </nav>
+    <small>Doraemon pertenece a sus respectivos creadores. Proyecto educativo sin fines de lucro.</small>
+  </footer>
 
   <script type="module" src="/src/main.js"></script>
 </body>

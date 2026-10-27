@@ -66,6 +66,11 @@ LÍMITES
 
 const MAX_MESSAGES = 20;
 const MAX_CHARS = 1500;
+const TOPIC_PROMPTS = {
+  ideas: "En esta conversación, prioriza ideas prácticas, realistas y fáciles de aplicar. Da pasos concretos y adapta las sugerencias a lo que la persona cuente.",
+  inventos: "En esta conversación, presenta inventos imaginativos del futuro de tu bolsillo mágico y explica con claridad cómo ayudarían. Mantén las ideas divertidas y seguras.",
+  charla: "En esta conversación, prioriza una charla cálida, amable y natural. Escucha primero y no propongas inventos salvo que la persona pida ayuda o le venga bien.",
+};
 
 // Límite sencillo de peticiones por IP (en memoria)
 const hits = new Map();
@@ -149,7 +154,7 @@ app.use(express.json({ limit: "50kb" }));
 
 app.post("/api/chat", rateLimit, async (req, res) => {
   try {
-    const { messages } = req.body ?? {};
+    const { messages, topic } = req.body ?? {};
     if (!Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: "Mensajes inválidos." });
     }
@@ -166,8 +171,10 @@ app.post("/api/chat", rateLimit, async (req, res) => {
       return res.status(400).json({ error: "La conversación debe terminar con un mensaje del usuario." });
     }
 
+    const topicPrompt = Object.hasOwn(TOPIC_PROMPTS, topic) ? TOPIC_PROMPTS[topic] : null;
+    const systemPrompt = topicPrompt ? `${SYSTEM_PROMPT}\n\nENFOQUE DE ESTA CONVERSACIÓN\n${topicPrompt}` : SYSTEM_PROMPT;
     const { response, data } = await callGemini({
-      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      systemInstruction: { parts: [{ text: systemPrompt }] },
       contents,
       generationConfig: { temperature: 0.9, maxOutputTokens: 1000 },
     });

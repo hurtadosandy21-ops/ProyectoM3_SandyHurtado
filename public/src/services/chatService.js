@@ -1,10 +1,10 @@
-export async function sendToDoraemon(history) {
+export async function sendToDoraemon(history, topic = null) {
   let response;
   try {
     response = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: history }),
+      body: JSON.stringify(topic ? { messages: history, topic } : { messages: history }),
     });
   } catch {
     throw new Error("No pude conectar con el servidor. Revisa que npm run dev siga corriendo.");
