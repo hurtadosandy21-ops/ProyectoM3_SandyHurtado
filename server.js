@@ -201,7 +201,7 @@ app.post("/api/chat", rateLimit, async (req, res) => {
 });
 
 // Solo exponemos la carpeta src, nunca la raíz del proyecto
-const publicSourceDir = path.resolve(__dirname, "src");
+const publicSourceDir = path.resolve(__dirname, "public", "src");
 app.use("/src", (req, res, next) => {
   const requestedFile = path.resolve(publicSourceDir, `.${req.path}`);
   if (!requestedFile.startsWith(`${publicSourceDir}${path.sep}`)) {
@@ -215,7 +215,7 @@ app.use("/src", (req, res, next) => {
 
 // Fallback SPA: cualquier ruta (/chat, /about...) devuelve index.html
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Vercel detects the exported app; local runs start a regular HTTP server.

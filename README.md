@@ -52,15 +52,15 @@ Las pruebas simulan la respuesta de Gemini; no necesitan una clave real ni hacen
 
 1. Sube el repositorio a GitHub y crea un proyecto nuevo en Vercel conectado a ese repositorio.
 2. Agrega `GEMINI_API_KEY` en **Settings → Environment Variables**. Añade `GEMINI_MODEL` o `GEMINI_FALLBACK_MODEL` solo si quieres cambiar los valores por defecto.
-3. Despliega el proyecto. Vercel detecta la aplicación Express exportada por `server.js`; `vercel.json` incluye los archivos del cliente en la función.
+3. Despliega el proyecto. Vercel detecta la aplicación Express exportada por `server.js` y publica automáticamente los archivos de `public/`.
 4. Abre la URL generada y comprueba Inicio, `/chat`, el historial del navegador y un mensaje al chatbot.
 
 ## Estructura
 
-- `src/`: interfaz, vistas, estilos, sonidos e imágenes.
+- `public/`: página y recursos estáticos de la interfaz (JavaScript, estilos, sonidos e imágenes).
 - `server.js`: aplicación Express, validación, límites de uso y proxy seguro a Gemini.
 - `test/`: pruebas de integración del servidor y unitarias del servicio de chat.
-- `vercel.json`: configuración de la función serverless.
+- `vercel.json`: esquema para validar la configuración de Vercel.
 
 ## Créditos
 

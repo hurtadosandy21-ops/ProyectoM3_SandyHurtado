@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { sendToDoraemon } from "../src/services/chatService.js";
+import { sendToDoraemon } from "../public/src/services/chatService.js";
 
 afterEach(() => {
   vi.unstubAllGlobals();
