@@ -17,11 +17,25 @@ describe("Aplicación Express", () => {
     expect(response.text).toContain("Doraemon Chat");
   });
 
-  it("mantiene el fallback SPA para rutas internas", async () => {
+  it("sirve la aplicación al abrir directamente la ruta de chat", async () => {
     const response = await request(app).get("/chat");
 
     expect(response.status).toBe(200);
     expect(response.text).toContain("/src/main.js");
+  });
+
+  it("sirve la aplicación al abrir directamente Acerca de", async () => {
+    const response = await request(app).get("/about");
+
+    expect(response.status).toBe(200);
+    expect(response.text).toContain("/src/main.js");
+  });
+
+  it("muestra una página 404 para rutas que no existen", async () => {
+    const response = await request(app).get("/interfaz");
+
+    expect(response.status).toBe(404);
+    expect(response.text).toContain("404 - Página no encontrada");
   });
 
   it("sirve los módulos del cliente", async () => {

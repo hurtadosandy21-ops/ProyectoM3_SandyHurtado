@@ -33,7 +33,7 @@ function updateSoundToggle() {
   const icon = soundToggle?.querySelector("[data-sound-icon]");
   if (icon) icon.textContent = muted ? "🔇" : "🔊";
   soundToggle?.setAttribute("aria-pressed", String(!muted));
-  soundToggle?.setAttribute("title", muted ? "Activar efectos de sonido" : "Silenciar efectos de sonido");
+  soundToggle?.setAttribute("title", muted ? "Activar música y efectos de sonido" : "Silenciar música y efectos de sonido");
 }
 
 soundToggle?.addEventListener("click", () => {

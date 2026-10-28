@@ -221,9 +221,17 @@ app.use("/src", (req, res, next) => {
   });
 });
 
-// Fallback SPA: cualquier ruta (/chat, /about...) devuelve index.html
-app.use((req, res) => {
+// Las rutas válidas de la SPA cargan el cliente también al abrir el enlace directamente.
+app.get(["/", "/chat", "/about"], (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Evita responder con el HTML de la app para rutas desconocidas o endpoints API inexistentes.
+app.use((req, res) => {
+  if (req.path.startsWith("/api/")) {
+    return res.status(404).json({ error: "Ruta API no encontrada." });
+  }
+  res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
 });
 
 // Vercel detects the exported app; local runs start a regular HTTP server.

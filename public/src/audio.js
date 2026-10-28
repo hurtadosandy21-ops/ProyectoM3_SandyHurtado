@@ -18,6 +18,8 @@ const sounds = {
 };
 
 let effectsMuted = readMuted();
+// El botón «Sonidos» de la barra silencia tanto los efectos como la música de introducción.
+sounds.intro.muted = effectsMuted;
 let unlockHandler = null;
 let introListener = null;
 
@@ -45,6 +47,7 @@ export function areEffectsMuted() {
 
 export function setEffectsMuted(value) {
   effectsMuted = value;
+  sounds.intro.muted = value; // la intro sigue su curso, pero sin sonido
   try {
     localStorage.setItem(MUTE_KEY, value ? "1" : "0");
   } catch {}
